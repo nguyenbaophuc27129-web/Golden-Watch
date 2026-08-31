@@ -1,0 +1,86 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+src/venv/
+src/env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.pth
+*.pkl
+*.task
+*.zip
+*.json.bak
+
+# Exclude large dataset files
+data/datasets/**/*.txt
+data/datasets/**/*.csv
+data/datasets/**/*.zip
+
+# Keep dataset structure but exclude large data files
+# (add data/ to include empty folder structure)
+
+# Test results and temporary files
+test_fixes_*.json
+test_*.json
+*.log
+
+# Backup files
+backups/
+*.bak
+
+# Exports and temporary
+exports/
+*.export
+
+# MediaPipe cache
+*.tflite
+*.txt.cache
+
+# Keep models folder but add large models to LFS if needed
+# models/*.pt
+# models/*.pth
+
+# Node modules (if any web frontend)
+node_modules/
+
+# Compiled binaries
+*.exe
+*.dll
+*.dylib
