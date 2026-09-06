@@ -152,13 +152,12 @@
 > **Quyết định 03/09:** Chuyển Module 5 từ Visual Field sang Radar LD2450 theo TONG_QUAN_DU_AN_FINAL.md.
 > Code cũ `visual_module.py` + model `visual_field_20260831_193418.pth` → chuyển thành legacy/archive.
 
-### M5-01: Chưa có code radar nào 🔴 (module mới)
-- **Cần build theo lịch Ngày 11-12 (12-13/09):**
-  1. LD2450 + UART-USB: `serial.Serial('COM3', 115200)`
-  2. `radar_module.py`: parse x, y, velocity + lọc nhiễu
-  3. Fall detection proxy: position_change > 1m + inactivity > 45s
-  4. Audio fusion AND-gate: `radar_fall AND audio_abnormal → ALERT`
-- **Trạng thái:** 🔴 CHƯA BẮT ĐẦU
+### M5-01: Chưa có code radar nào ✅ (code 06/09, sớm so với lịch 12-13/09) — chờ cắm hardware
+- `src/detection/radar_module.py` — `LD2450Parser` (buffer trượt, frame 30 bytes `AA FF 03 00` + 3×8 bytes int16 LE + tail `55 CC`, chống frame giả) + `RadarModule`
+- Fall proxy theo spec: |Δx|+|Δy| > 1m trong <2s (+40); bất hoạt >45s sau biến động (+60); audio AND-gate ×0.3 khi audio bình thường; fallback SIMULATION 3 kịch bản (normal/fall/wander) cho demo không cắm radar
+- Output format FusionEngine: `{'fall_prob', 'status', 'nihss_score': 0, 'metrics'}`
+- Test trong `src/test_all_metrics.py` G1-G6 (parser + gate + format) PASS
+- **Trạng thái:** ✅ CODE + SIM DONE — 🔴 chờ cắm LD2450 thật test UART (baud 256000, không phải 115200 như lịch ghi)
 
 ### M5-02: Phần cứng ✅ (đã mua 03/09)
 - **ĐÃ MUA 1× LD2450** + UART-USB adapter
@@ -198,29 +197,73 @@
 - **Bài học:** test hành vi thời gian (cooldown/rate-limit) phải tách scope; 1 instance = 1 config = 1 nhóm assert.
 - **Trạng thái:** ✅ ĐÃ FIX (7/7 PASS)
 
-### SYS-03: Thiếu 4-Layer Defense Engine 🔴
-- `src/defense/` RỖNG. Lịch ngày 12: Layer 1 Calibration (15 phút) → Layer 2 Context Awareness → Layer 3 Temporal Analysis → Layer 4 Adaptive Threshold. Target FPR <5%
-- **Deadline theo lịch:** 12-13/09
+### SYS-03: Thiếu 4-Layer Defense Engine ✅ (code 06/09, sớm so với lịch 12-13/09)
+- `src/defense/defense_engine.py` — class `DefenseEngine`
+- L1 `calibrate()` baseline cá nhân; L2 `update_context()` phân loại EXERCISE/WALKING/TALKING/REST → CONTEXT_SUPPRESS (đánh dấu defense_note, KHÔNG mất prob — suppress hoàn toàn có thể che đột quỵ thật khi đang vận động); L3 `verdict()` persistent >30s + ≥60% mẫu ≥50 mới alert (warming-up cho qua — fail-safe), trend 5p; L4 adaptive floor vùng xám [30,40) −5 điểm chỉ khi đã calibrate
+- **Trạng thái:** ✅ DONE (test F1-F6 PASS) — chờ tích hợp dài hạn với baseline thật 15 phút
 
-### SYS-04: Thiếu NIHSS Estimator + Triage + Handoff 🔴
-- Chỉ có NIHSS mapping rời rạc trong từng module. Chưa có: `nihss_estimator.py` (target r≥0.85), `triage_engine.py` (subtype/severity/hospital), `handoff_system.py` (report + QR + PDF)
-- **Deadline theo lịch:** Tuần 3 (16-22/09)
+### SYS-04: Thiếu NIHSS Estimator + Triage + Handoff ✅ (code 06/09, sớm so với lịch Tuần 3)
+- `src/fusion/nihss_estimator.py`: band prob→item ĐÚNG thang Brott 1989 (item4 ≤3, item5/6 ≤4, **item10 ≤2 → subtotal max 13 KHÔNG phải 15**); CI Monte Carlo ±10 prob, 1000 lần, margin 1.96·SD
+- `src/fusion/triage_engine.py`: subtype hint rule-based (base 80/20, +30 đau đầu, +20 nôn, −20 từ từ, −15 speech-dominant, clamp 5-95); severity MILD<6/MODERATE 6-10/SEVERE≥11 + nâng bậc WORSENING; hospital từ CSV
+- `src/handoff/handoff_system.py`: timeline T0-T4 + report JSON 8 khối + QR tóm tắt + PDF reportlab font Arial (có dấu TV)
+- `data/hospital_database.csv`: 6 BV/Phòng khám TP.HCM
+- **Trạng thái:** ✅ DONE (test H1-H4, I1-I4, J1-J3 PASS)
 
-### SYS-05: Dashboard Flask, kế hoạch là Streamlit 🟡
-- `webapp/app.py` (Flask) tồn tại; lịch ghi Streamlit. Cần quyết định giữ Flask hay chuyển.
-- **Trạng thái:** 🟡 CẦN QUYẾT ĐỊNH
+### SYS-05: Dashboard Flask, kế hoạch là Streamlit ✅ (quyết định + làm 06/09)
+- **Chốt: Streamlit** — `app_family.py` (app gia đình, giám sát liên tục 3s/fragment, 5 tab: Giám sát/Báo động feed/Kết quả NIHSS/Bệnh viện Handoff/Kiểm tra nói)
+- Zalo → APP IN-FEED (người thân mở app thấy tin nhắn báo động ngay)
+- `webapp/` Flask → legacy, không phát triển thêm
+- **Trạng thái:** ✅ DONE (HTTP 200 verified)
 
-### SYS-06: Bảng cơ sở khoa học Excel chưa tạo 🔴
-- Lịch Ngày 2 yêu cầu `BANG_CO_SO_KHOA_HOC.xlsx` (5 sheets) — hiện chỉ có file MD
-- **Trạng thái:** 🔴 CHƯA LÀM
+### SYS-06: Bảng cơ sở khoa học Excel chưa tạo ✅ (làm 06/09)
+- `BANG_CO_SO_KHOA_HOC.xlsx` — 5 sheets, 33 dòng (generate bằng `scripts/generate_science_table.py`)
+- **Trung thực về trạng thái nguồn:** VERIFIED (có DOI/PMID) / CANONICAL (kinh điển — cần check PubMed trước khi in poster, search quota hết đến 13/09) / SELF-DESIGN (tự thiết kế — cần validate lâm sàng)
+- **Trạng thái:** ✅ DONE — nợ verify DOI online sau 13/09
 
-### SYS-07: 0 thư xác nhận bác sĩ / 0 validation lâm sàng 🔴
-- Đã ghi trong DANH_GIA_SAN_PHAM_Y_TE.md — kế hoạch Tuần 3-4
-- **Trạng thái:** 🔴 CHƯA LÀM
+### SYS-07: 0 thư xác nhận bác sĩ / 0 validation lâm sàng 🟡 (đã chuẩn bị hồ sơ 06/09)
+- Tool: `src/fusion/validation_metrics.py` (pearson/MAE/CM/ROC/Youden/sign-test + evaluate_nihss_study/detection_study)
+- Quy trình: `docs/kiem_dinh_y_khoa/QUY_TRINH_KIEM_DINH_Y_KHOA.md` (Phần A 50 video NIHSS, B 100 kịch bản, C 2 thư)
+- Mẫu thư: `docs/kiem_dinh_y_khoa/MAU_THU_XAC_NHAN_BAC_SI.md` (Mẫu 1 thư xem xét consultation + Mẫu 2 phiếu đồng chấm NIHSS + checklist đi gặp)
+- **Trạng thái:** 🟡 HỒ SƠ SẴN SÀNG — 🔴 chưa đi gặp bác sĩ, chưa chạy 50 video (Tuần 3-4)
+
+### SYS-09: NameError `sys` không định nghĩa ×3 ✅ (fix 06/09)
+- **File:** `src/defense/defense_engine.py`, `src/fusion/nihss_estimator.py`, `src/fusion/triage_engine.py`
+- **Error:** `NameError: name 'sys' is not defined` khi chạy `__main__`
+- **Nguyên nhân:** dùng `sys.stdout.reconfigure(...)` trong `if __name__ == '__main__'` nhưng quên `import sys` ở đầu file (copy pattern từ file khác không kèm import)
+- **Cách fix:** thêm `import sys` vào cả 3 file
+- **Bài học:** pattern `sys.stdout.reconfigure` dùng ở `__main__` — file nào có block này phải import sys ở đầu; lỗi chỉ lộ khi chạy trực tiếp file, import từ module khác thì KHÔNG lộ → dễ sót. Test suite chạy trực tiếp từng file mới bắt được.
+- **Trạng thái:** ✅ ĐÃ FIX
+
+### SYS-10: KeyError 'VN-Bold' khi xuất PDF handoff ✅ (fix 06/09)
+- **File:** `src/handoff/handoff_system.py`
+- **Error:** `KeyError: 'VN-Bold'` (reportlab font registry)
+- **Nguyên nhân:** chỉ đăng ký `Arial` thành 'VN' nhưng code dùng `font + '-Bold'` cho tiêu đề → lookup fail
+- **Cách fix:** đăng ký thêm `arialbd.ttf` thành 'VN-Bold' (và italic nếu cần)
+- **Bài học:** reportlab phải đăng ký TỪNG variant font (regular/bold/italic) riêng — không tự suy từ font cha
+- **Trạng thái:** ✅ ĐÃ FIX
+
+### SYS-11: `distance_km` rỗng trong hospital_database.csv → gợi ý BV sai ✅ (fix 06/09)
+- **File:** `data/hospital_database.csv` + `src/fusion/triage_engine.py`
+- **Mô tả:** dòng "Phòng khám" có `distance_km` rỗng → Mild (chọn gần nhất) nên gợi ý BV Nhân dân 115 (4.5km) thay vì phòng khám gần nhất; sort bị lỗi giá trị 999
+- **Cách fix:** điền distance_km thật (1.2); `_b()` đọc an toàn + guard `float(h.get('distance_km') or 999)`
+- **Bài học:** dữ liệu CSV đầu vào phải validate (cột số không được rỗng); test I4 có assert "CSV sạch"
+- **Trạng thái:** ✅ ĐÃ FIX
+
+### SYS-12: 4 test FAIL trong lần chạy đầu test suite mở rộng (đều là lỗi THIẾT KẾ TEST) ✅ (fix 06/09)
+- **File:** `src/test_all_metrics.py` (section G, K)
+- **Chi tiết:**
+  1. K2: thiếu `f1_score` trong import list → NameError
+  2. K6: assert `threshold > 25` quá chặt — Youden chọn đúng th=25.0 (biên cụm normal linspace 5-25, 1 FP → Spec 98% vẫn PASS target)
+  3. G4/G5: kịch bản sim 'fall' PHA-DEPENDENT (random theo giây) → prob 18/40/100 tùy pha; lần đầu kỳ vọng cứng 30
+- **Cách fix:** import đủ; nới assert biên (>=25); **monkeypatch `rm.read_targets`** trả vị trí CỐ ĐỊNH (nằm yên 150,60) → deterministic: +60 bất hoạt, gate ×0.3 → 18 (audio normal) / 60 DANGER (audio bất thường)
+- **Bài học:** (1) test phải deterministic — không phụ thuộc random/time; mock input thay vì kỳ vọng may rơi đúng pha; (2) assert biên ngưỡng tối ưu phải theo logic Youden (có thể chọn ngay mép dữ liệu); (3) 58/58 PASS sau fix — code sản phẩm KHÔNG đổi gì
+- **Trạng thái:** ✅ ĐÃ FIX
 
 ---
 
 # ✍️ MẪU GHI LỖI MỚI
+
+---
 
 ```
 ### M<x>-<số>: <Tên lỗi ngắn> 🔴|🟡|✅
@@ -238,6 +281,7 @@
 
 ---
 
-**Cập nhật lần cuối:** 06/09/2026 — M2-10 fix (median3 consensus: TPR 96.3%, ROC th56 FPR 0%) + Alert System v1 (SYS-02 ✅)
-**Số lỗi đang mở:** M1: 2 | M2: 2 | M3: 1 | M4: 1 | M5: 1 | SYS: 5 = **12 mục cần làm**
+**Cập nhật lần cuối:** 06/09/2026 (buổi 2) — Hoàn thành engine stack: SYS-03 Defense ✅, SYS-04 NIHSS+Triage+Handoff ✅, SYS-05 Streamlit app gia đình ✅, SYS-06 Bảng khoa học ✅, SYS-07 hồ sơ kiểm định sẵn sàng, M5-01 radar code+sim ✅, AlertSystem v2 (app in-feed) ✅, SYS-09..12 fix. Test suite mở rộng **58/58 PASS**. Push GitHub Golden-Watch commit `01d0bf5`.
+**Số lỗi đang mở (cần làm tiếp):** M1: 2 (threshold nguồn, dọn version) | M2: 2 (M2-10 production integration, M2-11 chốt ngưỡng) | M3: 1 (nguồn threshold) | M4: 1 (nguồn symmetry) | M5: 1 (cắm LD2450 thật) | SYS: 1 (SYS-07 gặp bác sĩ + verify DOI sau 13/09) = **8 mục cần làm**
 **Kết quả Module 2 cuối cùng:** Extended 55 session, median3 consensus — TPR 96.3% (26/27), FPR 14.3% @th30 / **FPR 0.0% @th56 (Youden J=1.00)**, Accuracy 90.9%
+**Test suite tổng:** `src/test_all_metrics.py` — 58/58 PASS (A Speech 11, B Fusion 8, C Alert 4, D Models 4, E Artifacts 2, F Defense 6, G Radar 6, H NIHSS 4, I Triage 4, J Handoff 3, K Validation 6)
