@@ -1,0 +1,30 @@
+{
+  "timestamp": "20260828_182319",
+  "dataset": "TORGO",
+  "input_dim": 48,
+  "hidden_dims": [
+    128,
+    64,
+    32
+  ],
+  "num_classes": 2,
+  "epochs": 100,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "accuracy": 0.6703545385969324,
+  "precision": 0.3489971346704871,
+  "recall": 0.7767857142857143,
+  "f1_score": 0.4816132858837485,
+  "sensitivity": 77.67857142857143,
+  "specificity": 64.42217350454118,
+  "confusion_matrix": [
+    [
+      2057,
+      1136
+    ],
+    [
+      175,
+      609
+    ]
+  ]
+}

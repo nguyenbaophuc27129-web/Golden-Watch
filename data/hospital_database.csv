@@ -1,0 +1,7 @@
+name,address,phone,distance_km,ct_scanner,stroke_unit,thrombolysis,neurosurgery,notes
+Bệnh viện Nhân dân 115,"88 Đức Thắng, Q. Tân Bình, TP.HCM","(028) 3865 4363",4.5,1,1,1,1,"Trung tâm Đột quỵ — tuyến đầu TP.HCM, hỗ trợ 24/7"
+Bệnh viện Đại học Y Dược TP.HCM,"215 Hồng Bàng, Q. 5, TP.HCM","(028) 3855 4269",7.2,1,1,1,1,"Cơ sở 2 chuyên Thần kinh — lấy mẫu nghiên cứu/feedback bác sĩ"
+Bệnh viện Chợ Rẫy,"201B Nguyễn Chí Thanh, Q. 5, TP.HCM","(028) 3855 4137",7.5,1,1,1,1,"Tuyến cuối (quốc gia) — can thiệp nội mạch, phẫu thuật phức tạp"
+Bệnh viện Nhân dân Gia Định,"1 Lê Văn Khương, Q. Thủ Đức, TP.HCM","(028) 3726 0652",9.8,1,1,1,0,"Khoa Thần kinh — thrombolysis"
+Bệnh viện Quận Tân Bình,"775 Lý Thường Kiệt, Q. Tân Bình, TP.HCM","(028) 3811 7711",3.8,1,0,0,0,"Bệnh viện quận — sơ cứu, chuyển tuyến"
+Phòng khám Đa khoa Khu vực,"Địa phương — cập nhật khi cài đặt nhà","(028) 0000 0000",1.2,0,0,0,0,"Gần nhất cho mức MILD"

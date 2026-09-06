@@ -1,0 +1,31 @@
+{
+  "training_mode": "100_percent_no_split",
+  "accuracy": 93.74775422206253,
+  "sensitivity": 90.77380952380952,
+  "specificity": 96.52536483669215,
+  "precision": 96.06299212598425,
+  "confusion_matrix": [
+    [
+      1389,
+      50
+    ],
+    [
+      124,
+      1220
+    ]
+  ],
+  "total_images": 7498,
+  "valid_samples": 2783,
+  "stroke_samples": 1439,
+  "normal_samples": 1344,
+  "config": {
+    "epochs": 100,
+    "batch_size": 32,
+    "hidden_dims": [
+      512,
+      256,
+      128
+    ]
+  },
+  "training_time_minutes": 0.8137139836947124
+}

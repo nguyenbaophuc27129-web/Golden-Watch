@@ -99,7 +99,12 @@ class ArmWeaknessDetector:
                     return self.network(x)
 
             self.ml_model = ArmWeaknessClassifier()
-            self.ml_model.load_state_dict(torch.load(model_path, weights_only=True, map_location=self.device))
+            # Check PyTorch version for weights_only parameter
+            torch_version = tuple(map(int, torch.__version__.split('.')[:2]))
+            if torch_version >= (2, 6):
+                self.ml_model.load_state_dict(torch.load(model_path, weights_only=True, map_location=self.device))
+            else:
+                self.ml_model.load_state_dict(torch.load(model_path, map_location=self.device))
             self.ml_model.to(self.device)
             self.ml_model.eval()
             print(f"[ARM] ML model loaded from: {model_path}")
@@ -374,15 +379,26 @@ class ArmWeaknessDetector:
         return min(score, 100.0)
 
     def _map_to_nihss(self, arm_score):
-        """Mapping arm score sang NIHSS Item 5 (Motor Arm)"""
-        if arm_score < 50:
+        """
+        Mapping arm score sang NIHSS Item 5 (Motor Arm)
+
+        NIHSS Item 5 Scale:
+        - Score 0: No drift (arm holds 90° for 10 seconds)
+        - Score 1: Mild drift (arm drifts down but holds 90°)
+        - Score 2: Some effort against gravity (arm cannot get to 90°)
+        - Score 3: Falls immediately (no effort against gravity)
+        - Score 4: No movement (complete paralysis)
+        """
+        if arm_score < 30:
             return 0  # No drift
-        elif arm_score < 65:
+        elif arm_score < 50:
             return 1  # Mild drift
-        elif arm_score < 80:
+        elif arm_score < 70:
             return 2  # Some effort against gravity
+        elif arm_score < 90:
+            return 3  # Falls immediately
         else:
-            return 3  # No effort against gravity
+            return 4  # No movement
 
 
 # Test function

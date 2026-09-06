@@ -1,0 +1,28 @@
+{
+  "timestamp": "20260831_193418",
+  "model_path": "models\\visual_field_20260831_193418.pth",
+  "scaler_path": "models\\visual_field_20260831_193418_scaler.pkl",
+  "metrics": {
+    "accuracy": 0.93,
+    "sensitivity": 0.9411764705882353,
+    "specificity": 0.9242424242424242,
+    "precision": 0.8648648648648649,
+    "fpr": 0.07575757575757576,
+    "f1": 0.9014084507042254,
+    "auc": 0.9886363636363635,
+    "confusion_matrix": [
+      [
+        122,
+        10
+      ],
+      [
+        4,
+        64
+      ]
+    ]
+  },
+  "input_features": 20,
+  "architecture": "VisualFieldClassifier",
+  "description": "Visual field defect detection from eye tracking",
+  "nihss_item": "Item 3 - Visual"
+}

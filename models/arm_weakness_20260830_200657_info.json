@@ -1,0 +1,28 @@
+{
+  "timestamp": "20260830_200657",
+  "model_path": "models\\arm_weakness_20260830_200657.pth",
+  "scaler_path": "models\\arm_weakness_20260830_200657_scaler.pkl",
+  "metrics": {
+    "accuracy": 0.995,
+    "sensitivity": 0.9875,
+    "specificity": 1.0,
+    "precision": 1.0,
+    "fpr": 0.0,
+    "f1": 0.9937106918238994,
+    "auc": 1.0,
+    "confusion_matrix": [
+      [
+        120,
+        0
+      ],
+      [
+        1,
+        79
+      ]
+    ]
+  },
+  "input_features": 16,
+  "architecture": "ArmWeaknessClassifier",
+  "description": "Arm weakness detection from pose keypoints",
+  "nihss_item": "Item 5 - Motor Arm"
+}

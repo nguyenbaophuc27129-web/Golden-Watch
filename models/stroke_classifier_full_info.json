@@ -1,0 +1,29 @@
+{
+  "accuracy": 89.5870736086176,
+  "confusion_matrix": [
+    [
+      267,
+      21
+    ],
+    [
+      37,
+      232
+    ]
+  ],
+  "total_samples": 7498,
+  "valid_samples": 2783,
+  "train_samples": 2226,
+  "test_samples": 557,
+  "config": {
+    "epochs": 50,
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "hidden_dims": [
+      512,
+      256,
+      128
+    ],
+    "dropout": 0.3
+  },
+  "training_time_minutes": 0.35719303290049237
+}

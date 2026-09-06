@@ -1,0 +1,31 @@
+{
+  "timestamp": "20260829_120925",
+  "dataset": "Gait in Aging and Disease (v2 with sliding window)",
+  "input_dim": 8,
+  "hidden_dims": [
+    64,
+    32
+  ],
+  "num_classes": 2,
+  "epochs": 150,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "dropout": 0.5,
+  "weight_decay": 0.001,
+  "accuracy": 0.96875,
+  "precision": 0.75,
+  "recall": 1.0,
+  "f1_score": 0.8571428571428571,
+  "sensitivity": 100.0,
+  "specificity": 96.55172413793103,
+  "confusion_matrix": [
+    [
+      28,
+      1
+    ],
+    [
+      0,
+      3
+    ]
+  ]
+}

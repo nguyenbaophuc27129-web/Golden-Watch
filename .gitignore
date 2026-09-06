@@ -84,3 +84,24 @@ node_modules/
 *.exe
 *.dll
 *.dylib
+
+# ==== BỔ SUNG Golden-Watch (06/09) ====
+# Môi trường ảo thứ 3
+src/venv312/
+# Model YOLO pose 6MB ở src/ (tải runtime)
+src/yolov8n-pose.pt
+*.pt
+# Vosk model tiếng Việt (~45MB)
+models/vosk-model-vn-0.4/
+# Baseline người dùng (dữ liệu cá nhân)
+data/baselines/
+# Log runtime + test results + export handoff
+logs/
+test_results/
+# Claude Code local config
+.claude/
+# Windows artifact
+nul
+# Kết quả test rải rác ở root
+module_test_results_*.json
+

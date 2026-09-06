@@ -1,0 +1,31 @@
+{
+  "timestamp": "20260828_175927",
+  "input_dim": 48,
+  "hidden_dims": [
+    128,
+    64,
+    32
+  ],
+  "num_classes": 2,
+  "epochs": 100,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "dropout": 0.3,
+  "num_samples": 3000,
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1_score": 1.0,
+  "sensitivity": 100.0,
+  "specificity": 100.0,
+  "confusion_matrix": [
+    [
+      300,
+      0
+    ],
+    [
+      0,
+      300
+    ]
+  ]
+}

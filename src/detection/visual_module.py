@@ -23,9 +23,11 @@ except ImportError:
 
 try:
     import mediapipe as mp
+    from mediapipe.solutions import face_mesh as mp_face_mesh_module
     MEDIAPIPE_AVAILABLE = True
 except ImportError:
     MEDIAPIPE_AVAILABLE = False
+    mp_face_mesh_module = None
     print("[VISUAL] MediaPipe not available. Install: pip install mediapipe")
 
 
@@ -40,8 +42,8 @@ class VisualFieldDetector:
 
         if MEDIAPIPE_AVAILABLE:
             try:
-                mp_face_mesh = mp.solutions.face_mesh
-                self.face_mesh = mp_face_mesh.FaceMesh(
+                # Use the directly imported face_mesh module
+                self.face_mesh = mp_face_mesh_module.FaceMesh(
                     max_num_faces=1,
                     refine_landmarks=True,
                     min_detection_confidence=0.5,
@@ -103,7 +105,12 @@ class VisualFieldDetector:
                     return self.network(x)
 
             self.ml_model = VisualFieldClassifier()
-            self.ml_model.load_state_dict(torch.load(model_path, weights_only=True, map_location=self.device))
+            # Check PyTorch version for weights_only parameter
+            torch_version = tuple(map(int, torch.__version__.split('.')[:2]))
+            if torch_version >= (2, 6):
+                self.ml_model.load_state_dict(torch.load(model_path, weights_only=True, map_location=self.device))
+            else:
+                self.ml_model.load_state_dict(torch.load(model_path, map_location=self.device))
             self.ml_model.to(self.device)
             self.ml_model.eval()
             print(f"[VISUAL] ML model loaded from: {model_path}")
@@ -135,25 +142,20 @@ class VisualFieldDetector:
         LEFT_EYE_INDICES = [33, 160]  # Left and right eye corners
         RIGHT_EYE_INDICES = [263, 385]
 
-        # Get eye centers (simplified)
+        # Get eye centers (simplified - using eye corners)
         left_eye_center = np.array([landmarks[33].x, landmarks[33].y])
         right_eye_center = np.array([landmarks[263].x, landmarks[263].y])
 
-        # Generate 3 time points of gaze data (simulated)
+        # Use deterministic gaze features (no random noise)
+        # Repeat eye center 3 times for temporal consistency
         for t in range(3):
-            # Add small variation for natural movement
-            noise_x = np.random.normal(0, 0.01)
-            noise_y = np.random.normal(0, 0.01)
+            features.extend([left_eye_center[0], left_eye_center[1]])
+            features.extend([right_eye_center[0], right_eye_center[1]])
 
-            left_gaze = left_eye_center + np.array([noise_x, noise_y])
-            right_gaze = right_eye_center + np.array([noise_x, noise_y])
-
-            features.extend([left_gaze[0], left_gaze[1]])
-            features.extend([right_gaze[0], right_gaze[1]])
-
-        # Calculate eye openness (EAR)
-        LEFT_EYE = [33, 160, 158, 153, 144, 163]
-        RIGHT_EYE = [362, 385, 387, 380, 373, 393]
+        # Calculate eye openness (EAR) with correct landmark indices
+        # Correct EAR landmarks (clockwise from outer corner for left eye)
+        LEFT_EYE = [33, 160, 158, 133, 153, 144]  # Left eye EAR landmarks
+        RIGHT_EYE = [362, 385, 387, 263, 373, 380]  # Right eye EAR landmarks
 
         left_eye_pts = np.array([[landmarks[i].x, landmarks[i].y] for i in LEFT_EYE if i < len(landmarks)])
         right_eye_pts = np.array([[landmarks[i].x, landmarks[i].y] for i in RIGHT_EYE if i < len(landmarks)])
@@ -161,21 +163,17 @@ class VisualFieldDetector:
         left_ear = self._eye_aspect_ratio(left_eye_pts)
         right_ear = self._eye_aspect_ratio(right_eye_pts)
 
-        # Simulate visual field test results (8 stimuli positions)
-        # In real system, this would be from actual visual field testing
-        # For now, use rule-based estimation from eye openness
-
+        # Use deterministic visual field test results based on eye openness
+        # No random generation - use rule-based patterns
         if left_ear < 0.2 or right_ear < 0.2:
-            # One eye closed - severe defect
-            visual_field_results = [1, 0, 1, 1, 1, 1, 0, 0]  # Example pattern
+            # One eye closed - severe defect pattern
+            visual_field_results = [1, 0, 1, 1, 1, 1, 0, 0]  # Consistent pattern
         elif abs(left_ear - right_ear) > 0.15:
-            # Significant asymmetry - possible hemianopia
-            visual_field_results = [1, 0, 1, 1, 1, 1, 0, 1]
+            # Significant asymmetry - possible hemianopia pattern
+            visual_field_results = [1, 0, 1, 1, 1, 1, 0, 1]  # Consistent pattern
         else:
-            # Normal - can see most stimuli
-            n_seen = np.random.choice([6, 7, 8], p=[0.1, 0.3, 0.6])
-            visual_field_results = [1] * n_seen + [0] * (8 - n_seen)
-            np.random.shuffle(visual_field_results)
+            # Normal - all positions visible (use deterministic 8/8 seen)
+            visual_field_results = [1, 1, 1, 1, 1, 1, 1, 1]  # Perfect field
 
         features.extend(visual_field_results)
 
@@ -263,9 +261,9 @@ class VisualFieldDetector:
 
     def _calculate_metrics(self, landmarks):
         """Calculate visual metrics from landmarks"""
-        # Eye landmark indices
-        LEFT_EYE = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246]
-        RIGHT_EYE = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398]
+        # Use consistent eye landmark indices (same as extract_visual_features)
+        LEFT_EYE = [33, 160, 158, 133, 153, 144]  # Left eye EAR landmarks
+        RIGHT_EYE = [362, 385, 387, 263, 373, 380]  # Right eye EAR landmarks
 
         # Get eye landmarks
         left_eye_pts = np.array([[landmarks[i].x, landmarks[i].y] for i in LEFT_EYE if i < len(landmarks)])
