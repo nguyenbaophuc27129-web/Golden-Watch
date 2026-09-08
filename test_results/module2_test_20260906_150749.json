@@ -1,0 +1,1997 @@
+{
+  "timestamp": "20260906_150749",
+  "model": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\fga_project\\models/speech_torgo_20260828_211130.pth",
+  "extended": true,
+  "window_mode": "median3_best_windows_m2_10v2",
+  "threshold_alarm": 30,
+  "threshold_optimal": 56.0,
+  "TPR_optimal": 96.3,
+  "FPR_optimal": 0.0,
+  "n_normal": 28,
+  "n_dys": 27,
+  "TPR": 96.3,
+  "FPR": 14.3,
+  "accuracy": 90.9,
+  "results": [
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC01S01",
+      "status": "NORMAL",
+      "speech_prob": 5.829605460166931,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.348,
+      "window_start_s": 0.0,
+      "window_ratio": 0.348,
+      "source_ratio": 0.348,
+      "file": "wav_arrayMic_FC01S01_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_FC01S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.348,
+          "src_ratio": 0.348,
+          "prob": 5.8
+        },
+        {
+          "file": "wav_arrayMic_FC01S01_0002.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.114,
+          "src_ratio": 0.106,
+          "prob": 21.4
+        },
+        {
+          "file": "wav_arrayMic_FC01S01_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.096,
+          "src_ratio": 0.077,
+          "prob": 2.3
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC02S02",
+      "status": "WARNING",
+      "speech_prob": 36.615559458732605,
+      "nihss_score": 1,
+      "wpm": null,
+      "speech_ratio": 1.0,
+      "window_start_s": 0.0,
+      "window_ratio": 1.0,
+      "source_ratio": 1.0,
+      "file": "wav_arrayMic_FC02S02_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_FC02S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 1.0,
+          "src_ratio": 1.0,
+          "prob": 36.8
+        },
+        {
+          "file": "wav_arrayMic_FC02S02_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.343,
+          "src_ratio": 0.158,
+          "prob": 36.6
+        },
+        {
+          "file": "wav_arrayMic_FC02S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.247,
+          "src_ratio": 0.163,
+          "prob": 23.9
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC02S03",
+      "status": "NORMAL",
+      "speech_prob": 1.1130579747259617,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.44,
+      "window_start_s": 0.5,
+      "window_ratio": 0.44,
+      "source_ratio": 0.298,
+      "file": "wav_arrayMic_FC02S03_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_FC02S03_0005.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.44,
+          "src_ratio": 0.298,
+          "prob": 0.0
+        },
+        {
+          "file": "wav_arrayMic_FC02S03_0002.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.331,
+          "src_ratio": 0.208,
+          "prob": 1.1
+        },
+        {
+          "file": "wav_arrayMic_FC02S03_0004.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.229,
+          "src_ratio": 0.104,
+          "prob": 11.1
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC03S01",
+      "status": "WARNING",
+      "speech_prob": 55.130475759506226,
+      "nihss_score": 2,
+      "wpm": null,
+      "speech_ratio": 0.608,
+      "window_start_s": 1.9,
+      "window_ratio": 0.608,
+      "source_ratio": 0.407,
+      "file": "wav_arrayMic_FC03S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_FC03S01_0003.wav",
+          "start_s": 1.9,
+          "win_ratio": 0.608,
+          "src_ratio": 0.407,
+          "prob": 55.1
+        },
+        {
+          "file": "wav_arrayMic_FC03S01_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.488,
+          "src_ratio": 0.31,
+          "prob": 19.2
+        },
+        {
+          "file": "wav_arrayMic_FC03S01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.18,
+          "src_ratio": 0.18,
+          "prob": 69.4
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC03S02",
+      "status": "NORMAL",
+      "speech_prob": 2.0886652171611786,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.313,
+      "window_start_s": 0.0,
+      "window_ratio": 0.313,
+      "source_ratio": 0.313,
+      "file": "wav_arrayMic_FC03S02_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_FC03S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.313,
+          "src_ratio": 0.313,
+          "prob": 2.1
+        },
+        {
+          "file": "wav_arrayMic_FC03S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.275,
+          "src_ratio": 0.275,
+          "prob": 0.9
+        },
+        {
+          "file": "wav_arrayMic_FC03S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.15,
+          "src_ratio": 0.15,
+          "prob": 52.5
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC03S03",
+      "status": "NORMAL",
+      "speech_prob": 2.8883516788482666,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.3,
+      "window_start_s": 0.0,
+      "window_ratio": 0.3,
+      "source_ratio": 0.3,
+      "file": "wav_arrayMic_FC03S03_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_FC03S03_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.3,
+          "src_ratio": 0.3,
+          "prob": 2.9
+        },
+        {
+          "file": "wav_arrayMic_FC03S03_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.253,
+          "src_ratio": 0.21,
+          "prob": 0.0
+        },
+        {
+          "file": "wav_arrayMic_FC03S03_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.178,
+          "src_ratio": 0.178,
+          "prob": 6.0
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC01S01",
+      "status": "NORMAL",
+      "speech_prob": 6.507702171802521,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 1.0,
+      "window_start_s": 0.0,
+      "window_ratio": 1.0,
+      "source_ratio": 1.0,
+      "file": "wav_headMic_FC01S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_FC01S01_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 1.0,
+          "src_ratio": 1.0,
+          "prob": 6.6
+        },
+        {
+          "file": "wav_headMic_FC01S01_0002.wav",
+          "start_s": 1.9,
+          "win_ratio": 0.446,
+          "src_ratio": 0.368,
+          "prob": 6.5
+        },
+        {
+          "file": "wav_headMic_FC01S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.416,
+          "src_ratio": 0.416,
+          "prob": 2.7
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC02S03",
+      "status": "WARNING",
+      "speech_prob": 37.10467517375946,
+      "nihss_score": 1,
+      "wpm": null,
+      "speech_ratio": 0.94,
+      "window_start_s": 1.0,
+      "window_ratio": 0.94,
+      "source_ratio": 0.938,
+      "file": "wav_headMic_FC02S03_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_FC02S03_0003.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.94,
+          "src_ratio": 0.938,
+          "prob": 37.1
+        },
+        {
+          "file": "wav_headMic_FC02S03_0005.wav",
+          "start_s": 1.9,
+          "win_ratio": 0.687,
+          "src_ratio": 0.529,
+          "prob": 0.1
+        },
+        {
+          "file": "wav_headMic_FC02S03_0002.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.627,
+          "src_ratio": 0.497,
+          "prob": 54.1
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S01",
+      "status": "NORMAL",
+      "speech_prob": 0.6715580355376005,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.982,
+      "window_start_s": 0.0,
+      "window_ratio": 0.982,
+      "source_ratio": 0.982,
+      "file": "wav_headMic_FC03S01_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_FC03S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.982,
+          "src_ratio": 0.982,
+          "prob": 34.6
+        },
+        {
+          "file": "wav_headMic_FC03S01_0002.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.681,
+          "src_ratio": 0.519,
+          "prob": 0.7
+        },
+        {
+          "file": "wav_headMic_FC03S01_0003.wav",
+          "start_s": 2.4,
+          "win_ratio": 0.392,
+          "src_ratio": 0.278,
+          "prob": 0.5
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S02",
+      "status": "NORMAL",
+      "speech_prob": 0.20775275770574808,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.455,
+      "window_start_s": 0.0,
+      "window_ratio": 0.455,
+      "source_ratio": 0.455,
+      "file": "wav_headMic_FC03S02_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_FC03S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.455,
+          "src_ratio": 0.455,
+          "prob": 0.6
+        },
+        {
+          "file": "wav_headMic_FC03S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.25,
+          "src_ratio": 0.25,
+          "prob": 0.1
+        },
+        {
+          "file": "wav_headMic_FC03S02_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.229,
+          "src_ratio": 0.229,
+          "prob": 0.2
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S03",
+      "status": "NORMAL",
+      "speech_prob": 6.842505186796188,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.367,
+      "window_start_s": 0.0,
+      "window_ratio": 0.367,
+      "source_ratio": 0.311,
+      "file": "wav_headMic_FC03S03_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_FC03S03_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.367,
+          "src_ratio": 0.311,
+          "prob": 0.9
+        },
+        {
+          "file": "wav_headMic_FC03S03_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.269,
+          "src_ratio": 0.269,
+          "prob": 17.9
+        },
+        {
+          "file": "wav_headMic_FC03S03_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.163,
+          "src_ratio": 0.163,
+          "prob": 6.8
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC01S01",
+      "status": "NORMAL",
+      "speech_prob": 4.909025877714157,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.337,
+      "window_start_s": 1.0,
+      "window_ratio": 0.337,
+      "source_ratio": 0.238,
+      "file": "wav_arrayMic_MC01S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC01S01_0003.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.337,
+          "src_ratio": 0.238,
+          "prob": 6.0
+        },
+        {
+          "file": "wav_arrayMic_MC01S01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.243,
+          "src_ratio": 0.243,
+          "prob": 4.9
+        },
+        {
+          "file": "wav_arrayMic_MC01S01_0002.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.127,
+          "src_ratio": 0.101,
+          "prob": 0.3
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC01S02",
+      "status": "NORMAL",
+      "speech_prob": 2.4797674268484116,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.145,
+      "window_start_s": 0.0,
+      "window_ratio": 0.145,
+      "source_ratio": 0.145,
+      "file": "wav_arrayMic_MC01S02_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC01S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.145,
+          "src_ratio": 0.145,
+          "prob": 2.5
+        },
+        {
+          "file": "wav_arrayMic_MC01S02_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.133,
+          "src_ratio": 0.133,
+          "prob": 5.3
+        },
+        {
+          "file": "wav_arrayMic_MC01S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.127,
+          "src_ratio": 0.127,
+          "prob": 2.4
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC01S03",
+      "status": "NORMAL",
+      "speech_prob": 0.3071083687245846,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.217,
+      "window_start_s": 0.0,
+      "window_ratio": 0.217,
+      "source_ratio": 0.2,
+      "file": "wav_arrayMic_MC01S03_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC01S03_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.217,
+          "src_ratio": 0.2,
+          "prob": 0.5
+        },
+        {
+          "file": "wav_arrayMic_MC01S03_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.131,
+          "src_ratio": 0.131,
+          "prob": 0.1
+        },
+        {
+          "file": "wav_arrayMic_MC01S03_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.095,
+          "src_ratio": 0.095,
+          "prob": 0.3
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC02S01",
+      "status": "NORMAL",
+      "speech_prob": 25.289034843444824,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 1.0,
+      "window_start_s": 0.0,
+      "window_ratio": 1.0,
+      "source_ratio": 0.818,
+      "file": "wav_arrayMic_MC02S01_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC02S01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 1.0,
+          "src_ratio": 0.818,
+          "prob": 26.2
+        },
+        {
+          "file": "wav_arrayMic_MC02S01_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.343,
+          "src_ratio": 0.293,
+          "prob": 25.3
+        },
+        {
+          "file": "wav_arrayMic_MC02S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.277,
+          "src_ratio": 0.137,
+          "prob": 0.0
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC02S02",
+      "status": "NORMAL",
+      "speech_prob": 1.1936036869883537,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.188,
+      "window_start_s": 0.0,
+      "window_ratio": 0.188,
+      "source_ratio": 0.188,
+      "file": "wav_arrayMic_MC02S02_0010.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC02S02_0010.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.188,
+          "src_ratio": 0.188,
+          "prob": 0.2
+        },
+        {
+          "file": "wav_arrayMic_MC02S02_0011.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.114,
+          "src_ratio": 0.088,
+          "prob": 1.2
+        },
+        {
+          "file": "wav_arrayMic_MC02S02_0007.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.102,
+          "src_ratio": 0.097,
+          "prob": 1.4
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC03S01",
+      "status": "NORMAL",
+      "speech_prob": 0.48713497817516327,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.277,
+      "window_start_s": 0.0,
+      "window_ratio": 0.277,
+      "source_ratio": 0.209,
+      "file": "wav_arrayMic_MC03S01_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC03S01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.277,
+          "src_ratio": 0.209,
+          "prob": 0.5
+        },
+        {
+          "file": "wav_arrayMic_MC03S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.265,
+          "src_ratio": 0.205,
+          "prob": 3.8
+        },
+        {
+          "file": "wav_arrayMic_MC03S01_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.199,
+          "src_ratio": 0.15,
+          "prob": 0.2
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC03S02",
+      "status": "NORMAL",
+      "speech_prob": 2.528570778667927,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.182,
+      "window_start_s": 0.0,
+      "window_ratio": 0.182,
+      "source_ratio": 0.182,
+      "file": "wav_arrayMic_MC03S02_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC03S02_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.182,
+          "src_ratio": 0.182,
+          "prob": 3.2
+        },
+        {
+          "file": "wav_arrayMic_MC03S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.175,
+          "src_ratio": 0.175,
+          "prob": 2.3
+        },
+        {
+          "file": "wav_arrayMic_MC03S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.143,
+          "src_ratio": 0.143,
+          "prob": 2.5
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC04S01",
+      "status": "NORMAL",
+      "speech_prob": 0.015569289098493755,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.494,
+      "window_start_s": 0.0,
+      "window_ratio": 0.494,
+      "source_ratio": 0.4,
+      "file": "wav_arrayMic_MC04S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC04S01_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.494,
+          "src_ratio": 0.4,
+          "prob": 0.0
+        },
+        {
+          "file": "wav_arrayMic_MC04S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.38,
+          "src_ratio": 0.35,
+          "prob": 0.0
+        },
+        {
+          "file": "wav_arrayMic_MC04S01_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.338,
+          "src_ratio": 0.338,
+          "prob": 15.0
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC04S02",
+      "status": "NORMAL",
+      "speech_prob": 0.5971906241029501,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.6,
+      "window_start_s": 0.0,
+      "window_ratio": 0.6,
+      "source_ratio": 0.6,
+      "file": "wav_arrayMic_MC04S02_0655.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_MC04S02_0655.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.6,
+          "src_ratio": 0.6,
+          "prob": 0.6
+        },
+        {
+          "file": "wav_arrayMic_MC04S02_0657.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.187,
+          "src_ratio": 0.187,
+          "prob": 0.3
+        },
+        {
+          "file": "wav_arrayMic_MC04S02_0658.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.178,
+          "src_ratio": 0.178,
+          "prob": 0.6
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC01S01",
+      "status": "NORMAL",
+      "speech_prob": 6.642438471317291,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 1.0,
+      "window_start_s": 0.0,
+      "window_ratio": 1.0,
+      "source_ratio": 1.0,
+      "file": "wav_headMic_MC01S01_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC01S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 1.0,
+          "src_ratio": 1.0,
+          "prob": 34.8
+        },
+        {
+          "file": "wav_headMic_MC01S01_0002.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.464,
+          "src_ratio": 0.35,
+          "prob": 0.3
+        },
+        {
+          "file": "wav_headMic_MC01S01_0003.wav",
+          "start_s": 1.9,
+          "win_ratio": 0.422,
+          "src_ratio": 0.307,
+          "prob": 6.6
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC01S02",
+      "status": "NORMAL",
+      "speech_prob": 1.29189882427454,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.211,
+      "window_start_s": 0.0,
+      "window_ratio": 0.211,
+      "source_ratio": 0.211,
+      "file": "wav_headMic_MC01S02_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC01S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.211,
+          "src_ratio": 0.211,
+          "prob": 1.3
+        },
+        {
+          "file": "wav_headMic_MC01S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.19,
+          "src_ratio": 0.19,
+          "prob": 1.2
+        },
+        {
+          "file": "wav_headMic_MC01S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.167,
+          "src_ratio": 0.167,
+          "prob": 7.1
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC01S03",
+      "status": "NORMAL",
+      "speech_prob": 0.9004747495055199,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.307,
+      "window_start_s": 0.0,
+      "window_ratio": 0.307,
+      "source_ratio": 0.307,
+      "file": "wav_headMic_MC01S03_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC01S03_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.307,
+          "src_ratio": 0.307,
+          "prob": 1.4
+        },
+        {
+          "file": "wav_headMic_MC01S03_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.212,
+          "src_ratio": 0.212,
+          "prob": 0.4
+        },
+        {
+          "file": "wav_headMic_MC01S03_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.094,
+          "src_ratio": 0.094,
+          "prob": 0.9
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC02S01",
+      "status": "NORMAL",
+      "speech_prob": 21.221843361854553,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 1.0,
+      "window_start_s": 0.0,
+      "window_ratio": 1.0,
+      "source_ratio": 1.0,
+      "file": "wav_headMic_MC02S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC02S01_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 1.0,
+          "src_ratio": 1.0,
+          "prob": 21.2
+        },
+        {
+          "file": "wav_headMic_MC02S01_0005.wav",
+          "start_s": 1.4,
+          "win_ratio": 1.0,
+          "src_ratio": 0.771,
+          "prob": 31.8
+        },
+        {
+          "file": "wav_headMic_MC02S01_0004.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.452,
+          "src_ratio": 0.379,
+          "prob": 0.0
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC02S02",
+      "status": "NORMAL",
+      "speech_prob": 0.6395596079528332,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.113,
+      "window_start_s": 0.0,
+      "window_ratio": 0.113,
+      "source_ratio": 0.113,
+      "file": "wav_headMic_MC02S02_0007.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC02S02_0007.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.113,
+          "src_ratio": 0.113,
+          "prob": 0.6
+        },
+        {
+          "file": "wav_headMic_MC02S02_0008.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.103,
+          "src_ratio": 0.103,
+          "prob": 0.6
+        },
+        {
+          "file": "wav_headMic_MC02S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.048,
+          "src_ratio": 0.048,
+          "prob": 0.2
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC03S01",
+      "status": "WARNING",
+      "speech_prob": 34.42792296409607,
+      "nihss_score": 1,
+      "wpm": null,
+      "speech_ratio": 1.0,
+      "window_start_s": 0.0,
+      "window_ratio": 1.0,
+      "source_ratio": 1.0,
+      "file": "wav_headMic_MC03S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC03S01_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 1.0,
+          "src_ratio": 1.0,
+          "prob": 34.4
+        },
+        {
+          "file": "wav_headMic_MC03S01_0004.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.38,
+          "src_ratio": 0.318,
+          "prob": 51.6
+        },
+        {
+          "file": "wav_headMic_MC03S01_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.373,
+          "src_ratio": 0.301,
+          "prob": 2.0
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC03S02",
+      "status": "NORMAL",
+      "speech_prob": 1.2144669890403748,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.185,
+      "window_start_s": 0.0,
+      "window_ratio": 0.185,
+      "source_ratio": 0.185,
+      "file": "wav_headMic_MC03S02_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC03S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.185,
+          "src_ratio": 0.185,
+          "prob": 0.6
+        },
+        {
+          "file": "wav_headMic_MC03S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.12,
+          "src_ratio": 0.12,
+          "prob": 1.2
+        },
+        {
+          "file": "wav_headMic_MC03S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.082,
+          "src_ratio": 0.082,
+          "prob": 1.6
+        }
+      ]
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC04S01",
+      "status": "NORMAL",
+      "speech_prob": 0.05598760908469558,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.597,
+      "window_start_s": 0.0,
+      "window_ratio": 0.597,
+      "source_ratio": 0.597,
+      "file": "wav_headMic_MC04S01_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_MC04S01_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.597,
+          "src_ratio": 0.597,
+          "prob": 36.5
+        },
+        {
+          "file": "wav_headMic_MC04S01_0003.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.506,
+          "src_ratio": 0.435,
+          "prob": 0.1
+        },
+        {
+          "file": "wav_headMic_MC04S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.415,
+          "src_ratio": 0.415,
+          "prob": 0.1
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F01",
+      "status": "DANGER",
+      "speech_prob": 99.1112768650055,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.373,
+      "window_start_s": 1.0,
+      "window_ratio": 0.373,
+      "source_ratio": 0.287,
+      "file": "wav_arrayMic_F01_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_F01_0001.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.373,
+          "src_ratio": 0.287,
+          "prob": 99.1
+        },
+        {
+          "file": "wav_arrayMic_F01_0002.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.307,
+          "src_ratio": 0.243,
+          "prob": 98.8
+        },
+        {
+          "file": "wav_arrayMic_F01_0004.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.301,
+          "src_ratio": 0.234,
+          "prob": 99.9
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F03S01",
+      "status": "DANGER",
+      "speech_prob": 99.92645382881165,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.301,
+      "window_start_s": 1.4,
+      "window_ratio": 0.301,
+      "source_ratio": 0.156,
+      "file": "wav_arrayMic_F03S01_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_F03S01_0001.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.301,
+          "src_ratio": 0.156,
+          "prob": 100.0
+        },
+        {
+          "file": "wav_arrayMic_F03S01_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.277,
+          "src_ratio": 0.23,
+          "prob": 99.9
+        },
+        {
+          "file": "wav_arrayMic_F03S01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.2,
+          "src_ratio": 0.2,
+          "prob": 99.8
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F03S02",
+      "status": "DANGER",
+      "speech_prob": 98.87851476669312,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.156,
+      "window_start_s": 0.0,
+      "window_ratio": 0.156,
+      "source_ratio": 0.156,
+      "file": "wav_arrayMic_F03S02_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_F03S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.156,
+          "src_ratio": 0.156,
+          "prob": 99.4
+        },
+        {
+          "file": "wav_arrayMic_F03S02_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.114,
+          "src_ratio": 0.114,
+          "prob": 82.0
+        },
+        {
+          "file": "wav_arrayMic_F03S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.08,
+          "src_ratio": 0.08,
+          "prob": 98.9
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F03S03",
+      "status": "DANGER",
+      "speech_prob": 92.91227459907532,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.067,
+      "window_start_s": 0.0,
+      "window_ratio": 0.067,
+      "source_ratio": 0.067,
+      "file": "wav_arrayMic_F03S03_0006.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_F03S03_0006.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.067,
+          "src_ratio": 0.067,
+          "prob": 92.9
+        },
+        {
+          "file": "wav_arrayMic_F03S03_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.062,
+          "src_ratio": 0.062,
+          "prob": 91.4
+        },
+        {
+          "file": "wav_arrayMic_F03S03_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.056,
+          "src_ratio": 0.056,
+          "prob": 93.6
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F04S01",
+      "status": "DANGER",
+      "speech_prob": 92.15044379234314,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.133,
+      "window_start_s": 0.5,
+      "window_ratio": 0.133,
+      "source_ratio": 0.069,
+      "file": "wav_arrayMic_F04S01_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_F04S01_0004.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.133,
+          "src_ratio": 0.069,
+          "prob": 47.3
+        },
+        {
+          "file": "wav_arrayMic_F04S01_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.127,
+          "src_ratio": 0.088,
+          "prob": 99.8
+        },
+        {
+          "file": "wav_arrayMic_F04S01_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.127,
+          "src_ratio": 0.095,
+          "prob": 92.2
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F04S02",
+      "status": "DANGER",
+      "speech_prob": 94.21001672744751,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.151,
+      "window_start_s": 0.0,
+      "window_ratio": 0.151,
+      "source_ratio": 0.139,
+      "file": "wav_arrayMic_F04S02_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_F04S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.151,
+          "src_ratio": 0.139,
+          "prob": 97.6
+        },
+        {
+          "file": "wav_arrayMic_F04S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.12,
+          "src_ratio": 0.12,
+          "prob": 82.5
+        },
+        {
+          "file": "wav_arrayMic_F04S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.102,
+          "src_ratio": 0.097,
+          "prob": 94.2
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F01",
+      "status": "NORMAL",
+      "speech_prob": 17.548979818820953,
+      "nihss_score": 0,
+      "wpm": null,
+      "speech_ratio": 0.789,
+      "window_start_s": 0.0,
+      "window_ratio": 0.789,
+      "source_ratio": 0.655,
+      "file": "wav_headMic_F01_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_F01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.789,
+          "src_ratio": 0.655,
+          "prob": 17.5
+        },
+        {
+          "file": "wav_headMic_F01_0001.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.663,
+          "src_ratio": 0.553,
+          "prob": 12.7
+        },
+        {
+          "file": "wav_headMic_F01_0004.wav",
+          "start_s": 2.9,
+          "win_ratio": 0.524,
+          "src_ratio": 0.463,
+          "prob": 99.4
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F03S01",
+      "status": "DANGER",
+      "speech_prob": 99.87683892250061,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.819,
+      "window_start_s": 0.0,
+      "window_ratio": 0.819,
+      "source_ratio": 0.712,
+      "file": "wav_headMic_F03S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_F03S01_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.819,
+          "src_ratio": 0.712,
+          "prob": 62.9
+        },
+        {
+          "file": "wav_headMic_F03S01_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.458,
+          "src_ratio": 0.413,
+          "prob": 100.0
+        },
+        {
+          "file": "wav_headMic_F03S01_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.422,
+          "src_ratio": 0.229,
+          "prob": 99.9
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F03S02",
+      "status": "DANGER",
+      "speech_prob": 64.97367024421692,
+      "nihss_score": 2,
+      "wpm": null,
+      "speech_ratio": 0.134,
+      "window_start_s": 0.0,
+      "window_ratio": 0.134,
+      "source_ratio": 0.134,
+      "file": "wav_headMic_F03S02_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_F03S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.134,
+          "src_ratio": 0.134,
+          "prob": 91.5
+        },
+        {
+          "file": "wav_headMic_F03S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.096,
+          "src_ratio": 0.096,
+          "prob": 65.0
+        },
+        {
+          "file": "wav_headMic_F03S02_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.078,
+          "src_ratio": 0.078,
+          "prob": 11.6
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F03S03",
+      "status": "DANGER",
+      "speech_prob": 97.36921191215515,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.588,
+      "window_start_s": 0.0,
+      "window_ratio": 0.588,
+      "source_ratio": 0.588,
+      "file": "wav_headMic_F03S03_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_F03S03_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.588,
+          "src_ratio": 0.588,
+          "prob": 97.4
+        },
+        {
+          "file": "wav_headMic_F03S03_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.097,
+          "src_ratio": 0.097,
+          "prob": 93.8
+        },
+        {
+          "file": "wav_headMic_F03S03_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.086,
+          "src_ratio": 0.086,
+          "prob": 99.5
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F04S02",
+      "status": "WARNING",
+      "speech_prob": 59.452712535858154,
+      "nihss_score": 2,
+      "wpm": null,
+      "speech_ratio": 0.399,
+      "window_start_s": 0.0,
+      "window_ratio": 0.399,
+      "source_ratio": 0.399,
+      "file": "wav_headMic_F04S02_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_F04S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.399,
+          "src_ratio": 0.399,
+          "prob": 38.5
+        },
+        {
+          "file": "wav_headMic_F04S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.271,
+          "src_ratio": 0.266,
+          "prob": 59.5
+        },
+        {
+          "file": "wav_headMic_F04S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.24,
+          "src_ratio": 0.24,
+          "prob": 88.7
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M01S01",
+      "status": "DANGER",
+      "speech_prob": 97.71959781646729,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.518,
+      "window_start_s": 0.5,
+      "window_ratio": 0.518,
+      "source_ratio": 0.335,
+      "file": "wav_arrayMic_M01S01_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M01S01_0001.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.518,
+          "src_ratio": 0.335,
+          "prob": 94.8
+        },
+        {
+          "file": "wav_arrayMic_M01S01_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.512,
+          "src_ratio": 0.365,
+          "prob": 98.0
+        },
+        {
+          "file": "wav_arrayMic_M01S01_0003.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.512,
+          "src_ratio": 0.404,
+          "prob": 97.7
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M01S02",
+      "status": "DANGER",
+      "speech_prob": 98.02876710891724,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.277,
+      "window_start_s": 0.0,
+      "window_ratio": 0.277,
+      "source_ratio": 0.277,
+      "file": "wav_arrayMic_M01S02_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M01S02_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.277,
+          "src_ratio": 0.277,
+          "prob": 94.5
+        },
+        {
+          "file": "wav_arrayMic_M01S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.231,
+          "src_ratio": 0.231,
+          "prob": 99.1
+        },
+        {
+          "file": "wav_arrayMic_M01S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.229,
+          "src_ratio": 0.229,
+          "prob": 98.0
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M02S01",
+      "status": "DANGER",
+      "speech_prob": 98.9625632762909,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.388,
+      "window_start_s": 0.0,
+      "window_ratio": 0.388,
+      "source_ratio": 0.388,
+      "file": "wav_arrayMic_M02S01_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M02S01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.388,
+          "src_ratio": 0.388,
+          "prob": 59.1
+        },
+        {
+          "file": "wav_arrayMic_M02S01_0003.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.343,
+          "src_ratio": 0.228,
+          "prob": 99.0
+        },
+        {
+          "file": "wav_arrayMic_M02S01_0001.wav",
+          "start_s": 6.2,
+          "win_ratio": 0.331,
+          "src_ratio": 0.198,
+          "prob": 99.5
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M02S02",
+      "status": "DANGER",
+      "speech_prob": 99.61974620819092,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.458,
+      "window_start_s": 0.5,
+      "window_ratio": 0.458,
+      "source_ratio": 0.353,
+      "file": "wav_arrayMic_M02S02_0078.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M02S02_0078.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.458,
+          "src_ratio": 0.353,
+          "prob": 100.0
+        },
+        {
+          "file": "wav_arrayMic_M02S02_0074.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.199,
+          "src_ratio": 0.165,
+          "prob": 99.6
+        },
+        {
+          "file": "wav_arrayMic_M02S02_0077.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.133,
+          "src_ratio": 0.133,
+          "prob": 98.9
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M03S02",
+      "status": "DANGER",
+      "speech_prob": 84.31684374809265,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.247,
+      "window_start_s": 0.5,
+      "window_ratio": 0.247,
+      "source_ratio": 0.214,
+      "file": "wav_arrayMic_M03S02_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M03S02_0001.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.247,
+          "src_ratio": 0.214,
+          "prob": 8.8
+        },
+        {
+          "file": "wav_arrayMic_M03S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.154,
+          "src_ratio": 0.154,
+          "prob": 84.3
+        },
+        {
+          "file": "wav_arrayMic_M03S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.113,
+          "src_ratio": 0.113,
+          "prob": 99.4
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M04S01",
+      "status": "DANGER",
+      "speech_prob": 98.60879778862,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.854,
+      "window_start_s": 0.0,
+      "window_ratio": 0.854,
+      "source_ratio": 0.854,
+      "file": "wav_arrayMic_M04S01_0001.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M04S01_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.854,
+          "src_ratio": 0.854,
+          "prob": 95.3
+        },
+        {
+          "file": "wav_arrayMic_M04S01_0004.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.229,
+          "src_ratio": 0.198,
+          "prob": 100.0
+        },
+        {
+          "file": "wav_arrayMic_M04S01_0003.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.108,
+          "src_ratio": 0.091,
+          "prob": 98.6
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M04S02",
+      "status": "DANGER",
+      "speech_prob": 99.53758716583252,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 1.0,
+      "window_start_s": 0.0,
+      "window_ratio": 1.0,
+      "source_ratio": 1.0,
+      "file": "wav_arrayMic_M04S02_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M04S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 1.0,
+          "src_ratio": 1.0,
+          "prob": 49.4
+        },
+        {
+          "file": "wav_arrayMic_M04S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.53,
+          "src_ratio": 0.542,
+          "prob": 99.5
+        },
+        {
+          "file": "wav_arrayMic_M04S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.496,
+          "src_ratio": 0.496,
+          "prob": 100.0
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M05S01",
+      "status": "DANGER",
+      "speech_prob": 99.76721405982971,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.428,
+      "window_start_s": 0.5,
+      "window_ratio": 0.428,
+      "source_ratio": 0.366,
+      "file": "wav_arrayMic_M05S01_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_arrayMic_M05S01_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.428,
+          "src_ratio": 0.366,
+          "prob": 99.6
+        },
+        {
+          "file": "wav_arrayMic_M05S01_0004.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.373,
+          "src_ratio": 0.336,
+          "prob": 100.0
+        },
+        {
+          "file": "wav_arrayMic_M05S01_0001.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.283,
+          "src_ratio": 0.234,
+          "prob": 99.8
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M01S01",
+      "status": "DANGER",
+      "speech_prob": 94.47590112686157,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.982,
+      "window_start_s": 0.0,
+      "window_ratio": 0.982,
+      "source_ratio": 0.986,
+      "file": "wav_headMic_M01S01_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M01S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.982,
+          "src_ratio": 0.986,
+          "prob": 10.2
+        },
+        {
+          "file": "wav_headMic_M01S01_0002.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.693,
+          "src_ratio": 0.51,
+          "prob": 94.5
+        },
+        {
+          "file": "wav_headMic_M01S01_0001.wav",
+          "start_s": 1.9,
+          "win_ratio": 0.602,
+          "src_ratio": 0.41,
+          "prob": 97.8
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M01S02",
+      "status": "DANGER",
+      "speech_prob": 97.87008166313171,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.576,
+      "window_start_s": 0.0,
+      "window_ratio": 0.576,
+      "source_ratio": 0.576,
+      "file": "wav_headMic_M01S02_0004.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M01S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.576,
+          "src_ratio": 0.576,
+          "prob": 97.4
+        },
+        {
+          "file": "wav_headMic_M01S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.354,
+          "src_ratio": 0.354,
+          "prob": 98.1
+        },
+        {
+          "file": "wav_headMic_M01S02_0002.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.333,
+          "src_ratio": 0.333,
+          "prob": 97.9
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M02S01",
+      "status": "DANGER",
+      "speech_prob": 86.93419098854065,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.271,
+      "window_start_s": 1.4,
+      "window_ratio": 0.271,
+      "source_ratio": 0.121,
+      "file": "wav_headMic_M02S01_0003.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M02S01_0003.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.271,
+          "src_ratio": 0.121,
+          "prob": 99.7
+        },
+        {
+          "file": "wav_headMic_M02S01_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.259,
+          "src_ratio": 0.259,
+          "prob": 86.9
+        },
+        {
+          "file": "wav_headMic_M02S01_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.229,
+          "src_ratio": 0.177,
+          "prob": 10.6
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M02S02",
+      "status": "DANGER",
+      "speech_prob": 94.69543099403381,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.8,
+      "window_start_s": 0.0,
+      "window_ratio": 0.8,
+      "source_ratio": 0.8,
+      "file": "wav_headMic_M02S02_0075.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M02S02_0075.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.8,
+          "src_ratio": 0.8,
+          "prob": 94.7
+        },
+        {
+          "file": "wav_headMic_M02S02_0078.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.59,
+          "src_ratio": 0.493,
+          "prob": 99.3
+        },
+        {
+          "file": "wav_headMic_M02S02_0074.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.337,
+          "src_ratio": 0.276,
+          "prob": 1.4
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M03S02",
+      "status": "DANGER",
+      "speech_prob": 96.65384888648987,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.258,
+      "window_start_s": 0.0,
+      "window_ratio": 0.258,
+      "source_ratio": 0.258,
+      "file": "wav_headMic_M03S02_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M03S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.258,
+          "src_ratio": 0.258,
+          "prob": 96.7
+        },
+        {
+          "file": "wav_headMic_M03S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.141,
+          "src_ratio": 0.141,
+          "prob": 99.6
+        },
+        {
+          "file": "wav_headMic_M03S02_0003.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.128,
+          "src_ratio": 0.128,
+          "prob": 95.8
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M04S02",
+      "status": "DANGER",
+      "speech_prob": 91.23002290725708,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.982,
+      "window_start_s": 0.0,
+      "window_ratio": 0.982,
+      "source_ratio": 0.982,
+      "file": "wav_headMic_M04S02_0005.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M04S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.982,
+          "src_ratio": 0.982,
+          "prob": 76.1
+        },
+        {
+          "file": "wav_headMic_M04S02_0002.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.265,
+          "src_ratio": 0.215,
+          "prob": 93.0
+        },
+        {
+          "file": "wav_headMic_M04S02_0004.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.199,
+          "src_ratio": 0.142,
+          "prob": 91.2
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M05S01",
+      "status": "DANGER",
+      "speech_prob": 96.76970839500427,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.422,
+      "window_start_s": 1.0,
+      "window_ratio": 0.422,
+      "source_ratio": 0.333,
+      "file": "wav_headMic_M05S01_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M05S01_0002.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.422,
+          "src_ratio": 0.333,
+          "prob": 86.9
+        },
+        {
+          "file": "wav_headMic_M05S01_0001.wav",
+          "start_s": 1.0,
+          "win_ratio": 0.331,
+          "src_ratio": 0.248,
+          "prob": 97.9
+        },
+        {
+          "file": "wav_headMic_M05S01_0004.wav",
+          "start_s": 0.5,
+          "win_ratio": 0.307,
+          "src_ratio": 0.237,
+          "prob": 96.8
+        }
+      ]
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M05S02",
+      "status": "DANGER",
+      "speech_prob": 98.54651093482971,
+      "nihss_score": 3,
+      "wpm": null,
+      "speech_ratio": 0.422,
+      "window_start_s": 1.4,
+      "window_ratio": 0.422,
+      "source_ratio": 0.287,
+      "file": "wav_headMic_M05S02_0002.wav",
+      "window_probs": [
+        {
+          "file": "wav_headMic_M05S02_0002.wav",
+          "start_s": 1.4,
+          "win_ratio": 0.422,
+          "src_ratio": 0.287,
+          "prob": 62.6
+        },
+        {
+          "file": "wav_headMic_M05S02_0005.wav",
+          "start_s": 0.0,
+          "win_ratio": 0.295,
+          "src_ratio": 0.295,
+          "prob": 98.5
+        },
+        {
+          "file": "wav_headMic_M05S02_0001.wav",
+          "start_s": 3.4,
+          "win_ratio": 0.193,
+          "src_ratio": 0.106,
+          "prob": 99.9
+        }
+      ]
+    }
+  ]
+}

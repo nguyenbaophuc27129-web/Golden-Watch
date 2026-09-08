@@ -1,0 +1,84 @@
+{
+  "created": "2026-09-08T04:59:07.808690",
+  "cycles": 10,
+  "sections": {
+    "system": {
+      "python": "3.13.7",
+      "torch": "2.13.0+cpu",
+      "cuda_available": false,
+      "cpu_cores": 12
+    },
+    "camera_c270": {
+      "status": "OK",
+      "width": 1280,
+      "height": 720,
+      "read_fps": 32.2
+    },
+    "radar_ld2450": {
+      "ports": [
+        [
+          "COM6",
+          "Standard Serial over Bluetooth link (COM6)"
+        ],
+        [
+          "COM8",
+          "Standard Serial over Bluetooth link (COM8)"
+        ],
+        [
+          "COM4",
+          "Standard Serial over Bluetooth link (COM4)"
+        ],
+        [
+          "COM7",
+          "Standard Serial over Bluetooth link (COM7)"
+        ],
+        [
+          "COM3",
+          "Standard Serial over Bluetooth link (COM3)"
+        ],
+        [
+          "COM5",
+          "Standard Serial over Bluetooth link (COM5)"
+        ]
+      ],
+      "simulation": true,
+      "statuses_5nhịp": [
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL"
+      ],
+      "analysis_cycle_s": 0.3
+    },
+    "latency": [
+      {
+        "module": "face_mediapipe",
+        "mean_ms": 13.3,
+        "p95_ms": 14.3,
+        "max_ms": 14.7
+      },
+      {
+        "module": "arm_yolo+ml",
+        "error": "index 2 is out of bounds for axis 0 with size 2"
+      },
+      {
+        "module": "gait_yolo_cpu",
+        "mean_ms": 60.2,
+        "p95_ms": 63.4,
+        "max_ms": 64.8
+      },
+      {
+        "module": "fusion+defense+nihss",
+        "mean_ms": 0.0,
+        "p95_ms": 0.0,
+        "max_ms": 0.0
+      }
+    ],
+    "cycle_total": {
+      "sum_mean_ms": 73.5,
+      "note": "chu kỳ app = 3000 ms (fragment) — dư địa lớn; radar analyze thực tế 600 ms/nhịp trong app"
+    }
+  },
+  "chart": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\Golden_Watch_KHKT\\test_results\\prototype_benchmark_20260908_045928_latency.png"
+}

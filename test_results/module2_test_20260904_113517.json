@@ -1,0 +1,162 @@
+{
+  "timestamp": "20260904_113517",
+  "model": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\fga_project\\models/speech_torgo_20260828_211130.pth",
+  "threshold_alarm": 30,
+  "n_normal": 10,
+  "n_dys": 5,
+  "TPR": 100.0,
+  "FPR": 10.0,
+  "accuracy": 93.3,
+  "results": [
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC03S03",
+      "status": "NORMAL",
+      "speech_prob": 0.037282847915776074,
+      "nihss_score": 0,
+      "wpm": 108.0,
+      "speech_ratio": 0.253,
+      "file": "wav_arrayMic_FC03S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S01",
+      "status": "NORMAL",
+      "speech_prob": 2.5755856186151505,
+      "nihss_score": 0,
+      "wpm": 144.0,
+      "speech_ratio": 0.277,
+      "file": "wav_headMic_FC03S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC02S03",
+      "status": "NORMAL",
+      "speech_prob": 0.585045712068677,
+      "nihss_score": 0,
+      "wpm": 276.0,
+      "speech_ratio": 0.012,
+      "file": "wav_arrayMic_FC02S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S03",
+      "status": "NORMAL",
+      "speech_prob": 0.9340994991362095,
+      "nihss_score": 0,
+      "wpm": 132.0,
+      "speech_ratio": 0.367,
+      "file": "wav_headMic_FC03S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC04S02",
+      "status": "NORMAL",
+      "speech_prob": 0.6306987721472979,
+      "nihss_score": 0,
+      "wpm": 0.0,
+      "speech_ratio": 0.09,
+      "file": "wav_arrayMic_MC04S02_0655.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC04S01",
+      "status": "WARNING",
+      "speech_prob": 33.92467796802521,
+      "nihss_score": 1,
+      "wpm": 144.0,
+      "speech_ratio": 0.295,
+      "file": "wav_headMic_MC04S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC03S02",
+      "status": "NORMAL",
+      "speech_prob": 3.179137408733368,
+      "nihss_score": 0,
+      "wpm": 12.0,
+      "speech_ratio": 0.06,
+      "file": "wav_arrayMic_MC03S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC03S02",
+      "status": "NORMAL",
+      "speech_prob": 1.8526429310441017,
+      "nihss_score": 0,
+      "wpm": 12.0,
+      "speech_ratio": 0.024,
+      "file": "wav_headMic_MC03S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC03S01",
+      "status": "NORMAL",
+      "speech_prob": 26.422128081321716,
+      "nihss_score": 0,
+      "wpm": 108.0,
+      "speech_ratio": 0.223,
+      "file": "wav_headMic_MC03S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC04S01",
+      "status": "NORMAL",
+      "speech_prob": 15.04582166671753,
+      "nihss_score": 0,
+      "wpm": 120.0,
+      "speech_ratio": 0.295,
+      "file": "wav_arrayMic_MC04S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F04S02",
+      "status": "DANGER",
+      "speech_prob": 87.1692955493927,
+      "nihss_score": 3,
+      "wpm": 24.0,
+      "speech_ratio": 0.024,
+      "file": "wav_arrayMic_F04S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F03S03",
+      "status": "DANGER",
+      "speech_prob": 99.46491122245789,
+      "nihss_score": 3,
+      "wpm": 108.0,
+      "speech_ratio": 0.084,
+      "file": "wav_headMic_F03S03_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M05S01",
+      "status": "DANGER",
+      "speech_prob": 99.76721405982971,
+      "nihss_score": 3,
+      "wpm": 96.0,
+      "speech_ratio": 0.283,
+      "file": "wav_arrayMic_M05S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M04S02",
+      "status": "DANGER",
+      "speech_prob": 93.3581531047821,
+      "nihss_score": 3,
+      "wpm": 72.0,
+      "speech_ratio": 0.181,
+      "file": "wav_headMic_M04S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M04S02",
+      "status": "WARNING",
+      "speech_prob": 45.386022329330444,
+      "nihss_score": 1,
+      "wpm": 96.0,
+      "speech_ratio": 0.271,
+      "file": "wav_arrayMic_M04S02_0001.wav"
+    }
+  ]
+}

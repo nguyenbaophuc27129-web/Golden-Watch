@@ -1,0 +1,37 @@
+{
+  "version": "face_asym_v2_5feat",
+  "created": "20260907_223114",
+  "validation": "GroupKFold(5) theo block_id — không leakage ảnh liên tiếp",
+  "features": [
+    "mouth_ratio",
+    "eye_ratio",
+    "face_tilt",
+    "nasolabial_ratio",
+    "forehead_ratio"
+  ],
+  "scaler_mean": [
+    24.09272455869858,
+    15.069194373725349,
+    20.74690808081586,
+    19.597851720315145,
+    14.179291014392007
+  ],
+  "scaler_scale": [
+    22.121588892170067,
+    15.16027890367369,
+    13.315468378111357,
+    21.367141378537948,
+    13.18191788615406
+  ],
+  "coef": [
+    1.6415435965103033,
+    -0.3119028474067798,
+    0.12642123958453189,
+    -1.4729162662833921,
+    0.1960492273896125
+  ],
+  "intercept": -0.2403092866135254,
+  "threshold_warning": 0.5,
+  "auc_oof": 0.845,
+  "note": "M1-07: chỉ nối vào app SAU khi qua protocol B (SYS-15); nghệ thuật: 5 đặc trưng bất đối xứng, class-weight balanced"
+}

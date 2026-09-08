@@ -1,0 +1,354 @@
+{
+  "passed": 58,
+  "total": 58,
+  "results": [
+    {
+      "section": "A.Speech",
+      "name": "A1 VAD im lặng -> ratio 0, has_speech False",
+      "ok": true,
+      "detail": "ratio=0, noise_floor=0.0"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A2 VAD tone 440Hz liên tục -> ratio 1.0",
+      "ok": true,
+      "detail": "ratio=1.0"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A3 VAD 50% tiếng -> ratio ~0.5",
+      "ok": true,
+      "detail": "ratio=0.5 (~0.5)"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A4 WPM = words/duration*60",
+      "ok": true,
+      "detail": "150 & 144 & 0"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A5 NIHSS mapping item 10 đúng biên",
+      "ok": true,
+      "detail": "0/1/2/3 tại 30/50/70"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A6 select_best_window chọn vùng CÓ TIẾNG (M2-10)",
+      "ok": true,
+      "detail": "start=10.1s ratio=1.0"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A7 select_best_window audio ngắn/rỗng an toàn",
+      "ok": true,
+      "detail": "start=0, ratio cao"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A8 extract_window trả 5s chuẩn + info",
+      "ok": true,
+      "detail": "win@4.32s ratio=1.0"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A9 extract_features = 48, không NaN, pitch đúng",
+      "ok": true,
+      "detail": "48 features, pitch~440Hz"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A10 Baseline save/load roundtrip",
+      "ok": true,
+      "detail": "wpm=150 roundtrip OK"
+    },
+    {
+      "section": "A.Speech",
+      "name": "A11 predict im lặng -> NO_SPEECH + prob reset",
+      "ok": true,
+      "detail": "NO_SPEECH, prob=0"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B1 Adapter prob key (score/speech_prob/arm_prob...)",
+      "ok": true,
+      "detail": "4 keys adapter OK"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B2 Renormalize khi thiếu module",
+      "ok": true,
+      "detail": "fused=25 (40/10 renorm 0.4)"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B3 Module invalid bị loại + renormalize",
+      "ok": true,
+      "detail": "NO_SPEECH bỏ, fused=50"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B4 Luật R1: 2/3 FAST >=50 -> EMERGENCY",
+      "ok": true,
+      "detail": "45.7 -> 75 EMERGENCY"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B5 Luật R2: 1 module >=80 -> tối thiểu WARNING",
+      "ok": true,
+      "detail": "fused=55.0"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B6 Biên risk level NORMAL/MONITOR/WARNING/EMERGENCY",
+      "ok": true,
+      "detail": "6 biên 30/50/70 đúng"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B7 NIHSS total + severity MILD/MODERATE/SEVERE",
+      "ok": true,
+      "detail": "total=sum, 6-13=MODERATE, 14+=SEVERE"
+    },
+    {
+      "section": "B.Fusion",
+      "name": "B8 get_trend 4 trạng thái",
+      "ok": true,
+      "detail": "WORSENING/IMPROVING/STABLE/NO_DATA"
+    },
+    {
+      "section": "C.Alert",
+      "name": "C1 Quyết định mức theo score+risk (80/50)",
+      "ok": true,
+      "detail": "10/40 không báo, 60 WARN, 85/95 EMERGENCY"
+    },
+    {
+      "section": "C.Alert",
+      "name": "C2 Cooldown per-level (WARN không chặn EMERGENCY)",
+      "ok": true,
+      "detail": "per-level: warn->emer OK, emer lặp bị chặn"
+    },
+    {
+      "section": "C.Alert",
+      "name": "C3 Log JSONL: ghi + parse ngược được",
+      "ok": true,
+      "detail": "1 event parse OK"
+    },
+    {
+      "section": "C.Alert",
+      "name": "C4 Input rỗng/None an toàn",
+      "ok": true,
+      "detail": "None/{} không crash"
+    },
+    {
+      "section": "D.Models",
+      "name": "D1 File model bắt buộc tồn tại",
+      "ok": true,
+      "detail": "7 file OK"
+    },
+    {
+      "section": "D.Models",
+      "name": "D2 Speech .pth: in=48, out=2, khớp loader",
+      "ok": true,
+      "detail": "arch 48->256->128->64->2"
+    },
+    {
+      "section": "D.Models",
+      "name": "D3 Arm/Gait .pth load + kiến trúc liền mạch",
+      "ok": true,
+      "detail": "arm + gait load OK"
+    },
+    {
+      "section": "D.Models",
+      "name": "D4 Scaler load + n_features khớp",
+      "ok": true,
+      "detail": "speech=48 feats, arm=16"
+    },
+    {
+      "section": "E.Results",
+      "name": "E1 M2 extended (median3): TPR>=90, FPR_opt<5",
+      "ok": true,
+      "detail": "module2_test_20260906_150749.json: TPR 96.3%, FPR_opt 0.0%"
+    },
+    {
+      "section": "E.Results",
+      "name": "E2 Alert JSONL tồn tại + có event",
+      "ok": true,
+      "detail": "alerts_20260908.jsonl: 74 events"
+    },
+    {
+      "section": "F.Defense",
+      "name": "F1 L1 calibrate baseline cá nhân",
+      "ok": true,
+      "detail": "calibrate ghi baseline + timestamp"
+    },
+    {
+      "section": "F.Defense",
+      "name": "F2 L2 CONTEXT_SUPPRESS EXERCISE (giữ data)",
+      "ok": true,
+      "detail": "EXERCISE: ['face', 'arm'] marked, prob giữ nguyên"
+    },
+    {
+      "section": "F.Defense",
+      "name": "F3 L2 phân loại context theo motion+talking",
+      "ok": true,
+      "detail": "EXERCISE/WALKING/TALKING/REST đúng biên 0.6/0.2"
+    },
+    {
+      "section": "F.Defense",
+      "name": "F4 L4 adaptive floor vùng xám [30,40)",
+      "ok": true,
+      "detail": "35->30 khi calibrate, 45/35-không-calibrate giữ nguyên"
+    },
+    {
+      "section": "F.Defense",
+      "name": "F5 L3 temporal: transient vs persistent",
+      "ok": true,
+      "detail": "transient chặn / persistent qua / <50 im"
+    },
+    {
+      "section": "F.Defense",
+      "name": "F6 trend 4 trạng thái (window 5p)",
+      "ok": true,
+      "detail": "4 trend đúng"
+    },
+    {
+      "section": "G.Radar",
+      "name": "G1 LD2450Parser frame 30B + rác + ghép frame",
+      "ok": true,
+      "detail": "parse OK: {'x_cm': 25, 'y_cm': 150, 'speed_cms': 10}, 2 frame liền OK"
+    },
+    {
+      "section": "G.Radar",
+      "name": "G2 Frame giả (sai tail) không làm treo parser",
+      "ok": true,
+      "detail": "fake header bỏ, frame sau OK"
+    },
+    {
+      "section": "G.Radar",
+      "name": "G3 Ngưỡng fall đúng spec TONG_QUAN v6.0",
+      "ok": true,
+      "detail": "100cm / 45s / 0.3"
+    },
+    {
+      "section": "G.Radar",
+      "name": "G4 Fall: proxy bất hoạt + AND-gate x0.3",
+      "ok": true,
+      "detail": "60 -> 18 (gate x0.3, audio normal)"
+    },
+    {
+      "section": "G.Radar",
+      "name": "G5 AND-gate: audio bất thường -> giữ prob",
+      "ok": true,
+      "detail": "prob=60 giữ nguyên -> DANGER (audio bất thường)"
+    },
+    {
+      "section": "G.Radar",
+      "name": "G6 Normal không DANGER + format FusionEngine",
+      "ok": true,
+      "detail": "prob=0.0 status=NORMAL, đủ 4 key"
+    },
+    {
+      "section": "H.NIHSS",
+      "name": "H1 Band prob->item đúng biên (item10 max 2)",
+      "ok": true,
+      "detail": "band 4 items đúng biên, item10 max 2"
+    },
+    {
+      "section": "H.NIHSS",
+      "name": "H2 Total 4 module = 9, max_possible = 13",
+      "ok": true,
+      "detail": "total 9/13 {'item4_facial_palsy': 2, 'item5_motor_arm': 4, 'item6_motor_leg': 1, 'item10_dysarthria': 2}"
+    },
+    {
+      "section": "H.NIHSS",
+      "name": "H3 Invalid/missing/empty an toàn",
+      "ok": true,
+      "detail": "NO_FACE/None bị loại, missing ghi rõ, empty=0"
+    },
+    {
+      "section": "H.NIHSS",
+      "name": "H4 CI 95% Monte Carlo chứa total, biên [0,13]",
+      "ok": true,
+      "detail": "9 ± 2 [7-11]"
+    },
+    {
+      "section": "I.Triage",
+      "name": "I1 Subtype rule base + headache/vomiting",
+      "ok": true,
+      "detail": "base 80/20; +30 đầu đau +20 nôn -> hem 70%"
+    },
+    {
+      "section": "I.Triage",
+      "name": "I2 Speech-dominant +15% ischemic, clamp 95",
+      "ok": true,
+      "detail": "speech-dominant -> ischemic 95% (clamp)"
+    },
+    {
+      "section": "I.Triage",
+      "name": "I3 Severity MILD<6/MODERATE 6-10/SEVERE>=11 + trend",
+      "ok": true,
+      "detail": "5/8/12 + upgrade WORSENING đúng"
+    },
+    {
+      "section": "I.Triage",
+      "name": "I4 Hospital theo severity/subtype + CSV sạch",
+      "ok": true,
+      "detail": "SEVERE=Bệnh viện Nhân dân 115, MILD gần nhất, HEM có NS"
+    },
+    {
+      "section": "J.Handoff",
+      "name": "J1 Timeline T0 auto + add_event",
+      "ok": true,
+      "detail": "2 events T0->T3"
+    },
+    {
+      "section": "J.Handoff",
+      "name": "J2 build_report 8 khối + JSON roundtrip",
+      "ok": true,
+      "detail": "8 khối, save+load OK"
+    },
+    {
+      "section": "J.Handoff",
+      "name": "J3 QR tóm tắt tạo được + file tồn tại",
+      "ok": true,
+      "detail": "QR 968B"
+    },
+    {
+      "section": "K.Validation",
+      "name": "K1 pearson_r + mae cơ bản + an toàn",
+      "ok": true,
+      "detail": "r ±1, std0=0, MAE=1.5"
+    },
+    {
+      "section": "K.Validation",
+      "name": "K2 Confusion matrix + sens/spec/F1",
+      "ok": true,
+      "detail": "TP/FP/TN/FN + sens/spec/F1"
+    },
+    {
+      "section": "K.Validation",
+      "name": "K3 ROC + Youden J tách hoàn hảo",
+      "ok": true,
+      "detail": "J=1.0 @th=50.0"
+    },
+    {
+      "section": "K.Validation",
+      "name": "K4 paired sign test biên",
+      "ok": true,
+      "detail": "p=1 giống nhau; p<0.05 khác biệt rõ"
+    },
+    {
+      "section": "K.Validation",
+      "name": "K5 evaluate_nihss_study target r>=0.85 MAE<2",
+      "ok": true,
+      "detail": "PASS (r=0.977, MAE=0.66) / FAIL đúng"
+    },
+    {
+      "section": "K.Validation",
+      "name": "K6 evaluate_detection_study Sens>90 Spec>95",
+      "ok": true,
+      "detail": "PASS (Sens=100.0 Spec=100.0)/CHECK"
+    }
+  ]
+}

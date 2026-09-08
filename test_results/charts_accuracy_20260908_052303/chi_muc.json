@@ -1,0 +1,73 @@
+{
+  "folder": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\Golden_Watch_KHKT\\test_results\\charts_accuracy_20260908_052303",
+  "summary": {
+    "face_rules": {
+      "n": 478,
+      "n_positive": 157,
+      "auc": 0.638,
+      "auc_ci95": [
+        0.583,
+        0.687
+      ],
+      "op_threshold": 0.3,
+      "Acc": 0.571,
+      "Prec": 0.406,
+      "Sens": 0.656,
+      "Spec": 0.53,
+      "F1": 0.501
+    },
+    "face_ml": {
+      "n": 478,
+      "n_positive": 157,
+      "auc": 0.845,
+      "auc_ci95": [
+        0.802,
+        0.885
+      ],
+      "op_threshold": 0.5,
+      "Acc": 0.812,
+      "Prec": 0.708,
+      "Sens": 0.726,
+      "Spec": 0.854,
+      "F1": 0.717
+    },
+    "gait": {
+      "n": 162,
+      "n_positive": 17,
+      "auc": 0.89,
+      "auc_ci95": [
+        0.751,
+        0.969
+      ],
+      "op_threshold": 0.1,
+      "Acc": 0.895,
+      "Prec": 0.5,
+      "Sens": 0.941,
+      "Spec": 0.89,
+      "F1": 0.653
+    },
+    "speech": {
+      "n": 55,
+      "n_positive": 27,
+      "auc": 0.992,
+      "auc_ci95": [
+        0.968,
+        1.0
+      ],
+      "op_threshold": 0.3,
+      "Acc": 0.909,
+      "Prec": 0.867,
+      "Sens": 0.963,
+      "Spec": 0.857,
+      "F1": 0.912
+    }
+  },
+  "charts": [
+    "A_roc_gop.png",
+    "B_precision_recall.png",
+    "C_bar_metrics.png",
+    "D_sens_spec_theo_ngoang.png",
+    "E_forest_auc_ci.png",
+    "chi_muc.json"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "created": "2026-09-08T05:07:38.620090",
+  "cycles": 15,
+  "sections": {
+    "system": {
+      "python": "3.13.7",
+      "torch": "2.14.0+cu126",
+      "cuda_available": true,
+      "cpu_cores": 12,
+      "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "vram_total_mb": 6143,
+      "vram_free_mb": 5153
+    },
+    "camera_c270": {
+      "status": "OK",
+      "width": 1280,
+      "height": 720,
+      "read_fps": 31.9
+    },
+    "radar_ld2450": {
+      "ports": [
+        [
+          "COM6",
+          "Standard Serial over Bluetooth link (COM6)"
+        ],
+        [
+          "COM8",
+          "Standard Serial over Bluetooth link (COM8)"
+        ],
+        [
+          "COM4",
+          "Standard Serial over Bluetooth link (COM4)"
+        ],
+        [
+          "COM7",
+          "Standard Serial over Bluetooth link (COM7)"
+        ],
+        [
+          "COM3",
+          "Standard Serial over Bluetooth link (COM3)"
+        ],
+        [
+          "COM5",
+          "Standard Serial over Bluetooth link (COM5)"
+        ]
+      ],
+      "simulation": true,
+      "statuses_5nhịp": [
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL"
+      ],
+      "analysis_cycle_s": 0.3
+    },
+    "latency": [
+      {
+        "module": "face_mediapipe",
+        "mean_ms": 15.3,
+        "p95_ms": 17.5,
+        "max_ms": 18.0
+      },
+      {
+        "module": "arm_yolo+ml",
+        "mean_ms": 27.7,
+        "p95_ms": 50.5,
+        "max_ms": 69.5
+      },
+      {
+        "module": "gait_yolo_cpu",
+        "mean_ms": 17.4,
+        "p95_ms": 21.0,
+        "max_ms": 21.1
+      },
+      {
+        "module": "gait_yolo_cuda",
+        "mean_ms": 20.5,
+        "p95_ms": 25.1,
+        "max_ms": 25.5
+      },
+      {
+        "module": "fusion+defense+nihss",
+        "mean_ms": 0.0,
+        "p95_ms": 0.0,
+        "max_ms": 0.0
+      }
+    ],
+    "cycle_total": {
+      "sum_mean_ms": 80.9,
+      "note": "chu kỳ app = 3000 ms (fragment) — dư địa lớn; radar analyze thực tế 600 ms/nhịp trong app"
+    }
+  },
+  "chart": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\Golden_Watch_KHKT\\test_results\\prototype_benchmark_20260908_050756_latency.png"
+}

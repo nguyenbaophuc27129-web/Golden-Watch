@@ -1,0 +1,16 @@
+true,session,status,prob,nihss,wpm,speech_ratio,file
+NORMAL,F_Con/wav_arrayMic_FC03S03,NORMAL,0.04,0,108.0,0.253,wav_arrayMic_FC03S03_0001.wav
+NORMAL,F_Con/wav_headMic_FC03S01,NORMAL,2.58,0,144.0,0.277,wav_headMic_FC03S01_0001.wav
+NORMAL,F_Con/wav_arrayMic_FC02S03,NORMAL,0.59,0,276.0,0.012,wav_arrayMic_FC02S03_0001.wav
+NORMAL,F_Con/wav_headMic_FC03S03,NORMAL,0.93,0,132.0,0.367,wav_headMic_FC03S03_0001.wav
+NORMAL,M_Con/wav_arrayMic_MC04S02,NORMAL,0.63,0,0.0,0.09,wav_arrayMic_MC04S02_0655.wav
+NORMAL,M_Con/wav_headMic_MC04S01,WARNING,33.92,1,144.0,0.295,wav_headMic_MC04S01_0001.wav
+NORMAL,M_Con/wav_arrayMic_MC03S02,NORMAL,3.18,0,12.0,0.06,wav_arrayMic_MC03S02_0001.wav
+NORMAL,M_Con/wav_headMic_MC03S02,NORMAL,1.85,0,12.0,0.024,wav_headMic_MC03S02_0001.wav
+NORMAL,M_Con/wav_headMic_MC03S01,NORMAL,26.42,0,108.0,0.223,wav_headMic_MC03S01_0001.wav
+NORMAL,M_Con/wav_arrayMic_MC04S01,NORMAL,15.05,0,120.0,0.295,wav_arrayMic_MC04S01_0001.wav
+DYS,F_Dys/wav_arrayMic_F04S02,DANGER,87.17,3,24.0,0.024,wav_arrayMic_F04S02_0001.wav
+DYS,F_Dys/wav_headMic_F03S03,DANGER,99.46,3,108.0,0.084,wav_headMic_F03S03_0001.wav
+DYS,M_Dys/wav_arrayMic_M05S01,DANGER,99.77,3,96.0,0.283,wav_arrayMic_M05S01_0001.wav
+DYS,M_Dys/wav_headMic_M04S02,DANGER,93.36,3,72.0,0.181,wav_headMic_M04S02_0001.wav
+DYS,M_Dys/wav_arrayMic_M04S02,WARNING,45.39,1,96.0,0.271,wav_arrayMic_M04S02_0001.wav

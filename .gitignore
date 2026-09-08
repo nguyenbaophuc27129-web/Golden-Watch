@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Ứng dụng chạy tạo ra — không đưa vào git
+*.log
+
+# Hệ điều hành
+Thumbs.db
+.DS_Store
+
+# Công cụ
+.claude/

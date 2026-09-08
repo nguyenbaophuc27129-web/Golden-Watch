@@ -1,0 +1,93 @@
+{
+  "created": "2026-09-08T05:02:31.339380",
+  "cycles": 15,
+  "sections": {
+    "system": {
+      "python": "3.13.7",
+      "torch": "2.14.0+cu126",
+      "cuda_available": true,
+      "cpu_cores": 12,
+      "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "vram_total_mb": 6143,
+      "vram_free_mb": 5153
+    },
+    "camera_c270": {
+      "status": "OK",
+      "width": 1280,
+      "height": 720,
+      "read_fps": 31.4
+    },
+    "radar_ld2450": {
+      "ports": [
+        [
+          "COM6",
+          "Standard Serial over Bluetooth link (COM6)"
+        ],
+        [
+          "COM8",
+          "Standard Serial over Bluetooth link (COM8)"
+        ],
+        [
+          "COM4",
+          "Standard Serial over Bluetooth link (COM4)"
+        ],
+        [
+          "COM7",
+          "Standard Serial over Bluetooth link (COM7)"
+        ],
+        [
+          "COM3",
+          "Standard Serial over Bluetooth link (COM3)"
+        ],
+        [
+          "COM5",
+          "Standard Serial over Bluetooth link (COM5)"
+        ]
+      ],
+      "simulation": true,
+      "statuses_5nhịp": [
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL",
+        "NORMAL"
+      ],
+      "analysis_cycle_s": 0.3
+    },
+    "latency": [
+      {
+        "module": "face_mediapipe",
+        "mean_ms": 14.6,
+        "p95_ms": 15.6,
+        "max_ms": 15.9
+      },
+      {
+        "module": "arm_yolo+ml",
+        "error": "Could not run 'torchvision::nms' with arguments from the 'CUDA' backend. This could be because the operator doesn't exist for this backend, or was omitted during the selective/custom build process (if using custom build). If you are a Facebook employee using PyTorch on mobile, please visit https://fburl.com/ptmfixes for possible resolutions. 'torchvision::nms' is only available for these backends: [CPU, Meta, BackendSelect, Python, FuncTorchDynamicLayerBackMode, Functionalize, Conjugate, Negative, ZeroTensor, ADInplaceOrView, AutogradOther, AutogradCPU, AutogradCUDA, AutogradXLA, AutogradMPS, AutogradXPU, AutogradHPU, AutogradLazy, AutogradMTIA, AutogradMAIA, AutogradPrivateUse1, AutogradMeta, Tracer, AutocastCPU, AutocastMTIA, AutocastMAIA, AutocastXPU, AutocastMPS, AutocastCUDA, FuncTorchBatched, BatchedNestedTensor, FuncTorchVmapMode, Batched, VmapMode, FuncTorchGradWrapper, PythonTLSSnapshot, FuncTorchDynamicLayerFrontMode, PreDispatch, PythonDispatcher].\n\nCPU: registered at C:\\actions-runner\\_work\\vision\\vision\\pytorch\\vision\\torchvision\\csrc\\ops\\cpu\\nms_kernel.cpp:116 [kernel]\nMeta: registered at C:\\Users\\Admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\torch\\library.py:1012 [kernel]\nBackendSelect: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\BackendSelectFallbackKernel.cpp:3 [backend fallback]\nPython: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\PythonFallbackKernel.cpp:192 [backend fallback]\nFuncTorchDynamicLayerBackMode: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\functorch\\DynamicLayer.cpp:479 [backend fallback]\nFunctionalize: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\FunctionalizeFallbackKernel.cpp:411 [backend fallback]\nConjugate: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\ConjugateFallback.cpp:17 [backend fallback]\nNegative: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\native\\NegateFallback.cpp:18 [backend fallback]\nZeroTensor: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\ZeroTensorFallback.cpp:115 [backend fallback]\nADInplaceOrView: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:103 [backend fallback]\nAutogradOther: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:62 [backend fallback]\nAutogradCPU: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:66 [backend fallback]\nAutogradCUDA: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:74 [backend fallback]\nAutogradXLA: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:86 [backend fallback]\nAutogradMPS: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:94 [backend fallback]\nAutogradXPU: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:70 [backend fallback]\nAutogradHPU: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:107 [backend fallback]\nAutogradLazy: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:90 [backend fallback]\nAutogradMTIA: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:78 [backend fallback]\nAutogradMAIA: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:82 [backend fallback]\nAutogradPrivateUse1: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:111 [backend fallback]\nAutogradMeta: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\VariableFallbackKernel.cpp:98 [backend fallback]\nTracer: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\torch\\csrc\\autograd\\TraceTypeManual.cpp:296 [backend fallback]\nAutocastCPU: registered at C:\\Users\\Admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\torchvision\\_autograd_registrations.py:356 [kernel]\nAutocastMTIA: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\autocast_mode.cpp:474 [backend fallback]\nAutocastMAIA: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\autocast_mode.cpp:512 [backend fallback]\nAutocastXPU: registered at C:\\Users\\Admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\torchvision\\_autograd_registrations.py:356 [kernel]\nAutocastMPS: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\autocast_mode.cpp:224 [backend fallback]\nAutocastCUDA: registered at C:\\Users\\Admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\torchvision\\_autograd_registrations.py:356 [kernel]\nFuncTorchBatched: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\functorch\\LegacyBatchingRegistrations.cpp:730 [backend fallback]\nBatchedNestedTensor: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\functorch\\LegacyBatchingRegistrations.cpp:757 [backend fallback]\nFuncTorchVmapMode: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\functorch\\VmapModeRegistrations.cpp:22 [backend fallback]\nBatched: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\LegacyBatchingRegistrations.cpp:1072 [backend fallback]\nVmapMode: fallthrough registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\VmapModeRegistrations.cpp:32 [backend fallback]\nFuncTorchGradWrapper: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\functorch\\TensorWrapper.cpp:210 [backend fallback]\nPythonTLSSnapshot: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\PythonFallbackKernel.cpp:200 [backend fallback]\nFuncTorchDynamicLayerFrontMode: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\functorch\\DynamicLayer.cpp:475 [backend fallback]\nPreDispatch: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\PythonFallbackKernel.cpp:204 [backend fallback]\nPythonDispatcher: registered at C:\\actions-runner\\_work\\pytorch\\pytorch\\aten\\src\\ATen\\core\\PythonFallbackKernel.cpp:196 [backend fallback]\n"
+      },
+      {
+        "module": "gait_yolo_cpu",
+        "mean_ms": 24.8,
+        "p95_ms": 32.1,
+        "max_ms": 36.4
+      },
+      {
+        "module": "gait_yolo_cuda",
+        "mean_ms": 18.6,
+        "p95_ms": 24.5,
+        "max_ms": 29.0
+      },
+      {
+        "module": "fusion+defense+nihss",
+        "mean_ms": 0.0,
+        "p95_ms": 0.0,
+        "max_ms": 0.0
+      }
+    ],
+    "cycle_total": {
+      "sum_mean_ms": 58.0,
+      "note": "chu kỳ app = 3000 ms (fragment) — dư địa lớn; radar analyze thực tế 600 ms/nhịp trong app"
+    }
+  },
+  "chart": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\Golden_Watch_KHKT\\test_results\\prototype_benchmark_20260908_050247_latency.png"
+}

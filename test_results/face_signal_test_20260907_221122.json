@@ -1,0 +1,40 @@
+{
+  "purpose": "Kiểm chứng dataset face có chứa tín hiệu phân biệt không",
+  "created": "2026-09-07T22:11:22.232096",
+  "n_test": 776,
+  "n_valid": 478,
+  "n_stroke_valid": 157,
+  "n_nonstroke_valid": 321,
+  "T1_effect_sizes": {
+    "mouth_ratio": {
+      "mean_stroke": 34.713,
+      "mean_nonstroke": 18.898,
+      "cohens_d": 0.759
+    },
+    "eye_ratio": {
+      "mean_stroke": 10.283,
+      "mean_nonstroke": 17.41,
+      "cohens_d": -0.482
+    },
+    "face_tilt": {
+      "mean_stroke": 22.906,
+      "mean_nonstroke": 19.691,
+      "cohens_d": 0.243
+    },
+    "nasolabial_ratio": {
+      "mean_stroke": 11.81,
+      "mean_nonstroke": 23.407,
+      "cohens_d": -0.561
+    },
+    "forehead_ratio": {
+      "mean_stroke": 13.542,
+      "mean_nonstroke": 14.491,
+      "cohens_d": -0.072
+    }
+  },
+  "T2_logistic_auc_same_data": 0.856,
+  "T3_mlp_auc_same_data": 0.892,
+  "reference_rules_auc_test_split": 0.638,
+  "reference_raw_mlp_auc_test_split": 0.555,
+  "verdict": "Dataset CÓ tín hiệu đủ mạnh cho AI học"
+}

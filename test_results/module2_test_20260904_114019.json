@@ -1,0 +1,566 @@
+{
+  "timestamp": "20260904_114019",
+  "model": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\fga_project\\models/speech_torgo_20260828_211130.pth",
+  "extended": true,
+  "threshold_alarm": 30,
+  "threshold_optimal": 51.0,
+  "TPR_optimal": 85.2,
+  "FPR_optimal": 0.0,
+  "n_normal": 28,
+  "n_dys": 27,
+  "TPR": 85.2,
+  "FPR": 3.6,
+  "accuracy": 90.9,
+  "results": [
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC01S01",
+      "status": "NORMAL",
+      "speech_prob": 2.323107235133648,
+      "nihss_score": 0,
+      "wpm": 120.0,
+      "speech_ratio": 0.096,
+      "file": "wav_arrayMic_FC01S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC02S02",
+      "status": "NORMAL",
+      "speech_prob": 0.35102954134345055,
+      "nihss_score": 0,
+      "wpm": 180.0,
+      "speech_ratio": 0.042,
+      "file": "wav_arrayMic_FC02S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC02S03",
+      "status": "NORMAL",
+      "speech_prob": 0.585045712068677,
+      "nihss_score": 0,
+      "wpm": 276.0,
+      "speech_ratio": 0.012,
+      "file": "wav_arrayMic_FC02S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC03S01",
+      "status": "NORMAL",
+      "speech_prob": 3.6579586565494537,
+      "nihss_score": 0,
+      "wpm": 156.0,
+      "speech_ratio": 0.018,
+      "file": "wav_arrayMic_FC03S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC03S02",
+      "status": "NORMAL",
+      "speech_prob": 0.9750863537192345,
+      "nihss_score": 0,
+      "wpm": 48.0,
+      "speech_ratio": 0.048,
+      "file": "wav_arrayMic_FC03S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_arrayMic_FC03S03",
+      "status": "NORMAL",
+      "speech_prob": 0.037282847915776074,
+      "nihss_score": 0,
+      "wpm": 108.0,
+      "speech_ratio": 0.253,
+      "file": "wav_arrayMic_FC03S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC01S01",
+      "status": "NORMAL",
+      "speech_prob": 13.801079988479614,
+      "nihss_score": 0,
+      "wpm": 72.0,
+      "speech_ratio": 0.114,
+      "file": "wav_headMic_FC01S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC02S03",
+      "status": "NO_SPEECH",
+      "speech_prob": 50.15115737915039,
+      "nihss_score": 0,
+      "wpm": 0.0,
+      "speech_ratio": 0.018,
+      "file": "wav_headMic_FC02S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S01",
+      "status": "NORMAL",
+      "speech_prob": 2.5755856186151505,
+      "nihss_score": 0,
+      "wpm": 144.0,
+      "speech_ratio": 0.277,
+      "file": "wav_headMic_FC03S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S02",
+      "status": "NORMAL",
+      "speech_prob": 0.20775275770574808,
+      "nihss_score": 0,
+      "wpm": 72.0,
+      "speech_ratio": 0.181,
+      "file": "wav_headMic_FC03S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "F_Con/wav_headMic_FC03S03",
+      "status": "NORMAL",
+      "speech_prob": 0.9340994991362095,
+      "nihss_score": 0,
+      "wpm": 132.0,
+      "speech_ratio": 0.367,
+      "file": "wav_headMic_FC03S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC01S01",
+      "status": "NORMAL",
+      "speech_prob": 0.16251233173534274,
+      "nihss_score": 0,
+      "wpm": 120.0,
+      "speech_ratio": 0.012,
+      "file": "wav_arrayMic_MC01S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC01S02",
+      "status": "NORMAL",
+      "speech_prob": 5.289287492632866,
+      "nihss_score": 0,
+      "wpm": 24.0,
+      "speech_ratio": 0.048,
+      "file": "wav_arrayMic_MC01S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC01S03",
+      "status": "NORMAL",
+      "speech_prob": 9.390614181756973,
+      "nihss_score": 0,
+      "wpm": 12.0,
+      "speech_ratio": 0.018,
+      "file": "wav_arrayMic_MC01S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC02S01",
+      "status": "NORMAL",
+      "speech_prob": 0.177149404771626,
+      "nihss_score": 0,
+      "wpm": 120.0,
+      "speech_ratio": 0.018,
+      "file": "wav_arrayMic_MC02S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC02S02",
+      "status": "NORMAL",
+      "speech_prob": 1.395619660615921,
+      "nihss_score": 0,
+      "wpm": 120.0,
+      "speech_ratio": 0.102,
+      "file": "wav_arrayMic_MC02S02_0007.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC03S01",
+      "status": "NORMAL",
+      "speech_prob": 13.372419774532318,
+      "nihss_score": 0,
+      "wpm": 132.0,
+      "speech_ratio": 0.018,
+      "file": "wav_arrayMic_MC03S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC03S02",
+      "status": "NORMAL",
+      "speech_prob": 3.179137408733368,
+      "nihss_score": 0,
+      "wpm": 12.0,
+      "speech_ratio": 0.06,
+      "file": "wav_arrayMic_MC03S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC04S01",
+      "status": "NORMAL",
+      "speech_prob": 15.04582166671753,
+      "nihss_score": 0,
+      "wpm": 120.0,
+      "speech_ratio": 0.295,
+      "file": "wav_arrayMic_MC04S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_arrayMic_MC04S02",
+      "status": "NORMAL",
+      "speech_prob": 0.6306987721472979,
+      "nihss_score": 0,
+      "wpm": 0.0,
+      "speech_ratio": 0.09,
+      "file": "wav_arrayMic_MC04S02_0655.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC01S01",
+      "status": "NORMAL",
+      "speech_prob": 1.2977511622011662,
+      "nihss_score": 0,
+      "wpm": 60.0,
+      "speech_ratio": 0.259,
+      "file": "wav_headMic_MC01S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC01S02",
+      "status": "NORMAL",
+      "speech_prob": 3.329814597964287,
+      "nihss_score": 0,
+      "wpm": 12.0,
+      "speech_ratio": 0.048,
+      "file": "wav_headMic_MC01S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC01S03",
+      "status": "NORMAL",
+      "speech_prob": 0.3682303009554744,
+      "nihss_score": 0,
+      "wpm": 12.0,
+      "speech_ratio": 0.036,
+      "file": "wav_headMic_MC01S03_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC02S01",
+      "status": "NORMAL",
+      "speech_prob": 0.28069717809557915,
+      "nihss_score": 0,
+      "wpm": 72.0,
+      "speech_ratio": 0.289,
+      "file": "wav_headMic_MC02S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC02S02",
+      "status": "NORMAL",
+      "speech_prob": 1.6270499676465988,
+      "nihss_score": 0,
+      "wpm": 24.0,
+      "speech_ratio": 0.018,
+      "file": "wav_headMic_MC02S02_0004.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC03S01",
+      "status": "NORMAL",
+      "speech_prob": 26.422128081321716,
+      "nihss_score": 0,
+      "wpm": 108.0,
+      "speech_ratio": 0.223,
+      "file": "wav_headMic_MC03S01_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC03S02",
+      "status": "NORMAL",
+      "speech_prob": 1.8526429310441017,
+      "nihss_score": 0,
+      "wpm": 12.0,
+      "speech_ratio": 0.024,
+      "file": "wav_headMic_MC03S02_0001.wav"
+    },
+    {
+      "true": "NORMAL",
+      "session": "M_Con/wav_headMic_MC04S01",
+      "status": "WARNING",
+      "speech_prob": 33.92467796802521,
+      "nihss_score": 1,
+      "wpm": 144.0,
+      "speech_ratio": 0.295,
+      "file": "wav_headMic_MC04S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F01",
+      "status": "DANGER",
+      "speech_prob": 98.35307002067566,
+      "nihss_score": 3,
+      "wpm": 132.0,
+      "speech_ratio": 0.319,
+      "file": "wav_arrayMic_F01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F03S01",
+      "status": "DANGER",
+      "speech_prob": 99.57740902900696,
+      "nihss_score": 3,
+      "wpm": 108.0,
+      "speech_ratio": 0.277,
+      "file": "wav_arrayMic_F03S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F03S02",
+      "status": "DANGER",
+      "speech_prob": 82.01253414154053,
+      "nihss_score": 3,
+      "wpm": 24.0,
+      "speech_ratio": 0.048,
+      "file": "wav_arrayMic_F03S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F03S03",
+      "status": "DANGER",
+      "speech_prob": 98.48498106002808,
+      "nihss_score": 3,
+      "wpm": 96.0,
+      "speech_ratio": 0.012,
+      "file": "wav_arrayMic_F03S03_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F04S01",
+      "status": "DANGER",
+      "speech_prob": 99.82478618621826,
+      "nihss_score": 3,
+      "wpm": 144.0,
+      "speech_ratio": 0.127,
+      "file": "wav_arrayMic_F04S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_arrayMic_F04S02",
+      "status": "DANGER",
+      "speech_prob": 87.1692955493927,
+      "nihss_score": 3,
+      "wpm": 24.0,
+      "speech_ratio": 0.024,
+      "file": "wav_arrayMic_F04S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F01",
+      "status": "DANGER",
+      "speech_prob": 89.68784213066101,
+      "nihss_score": 3,
+      "wpm": 120.0,
+      "speech_ratio": 0.62,
+      "file": "wav_headMic_F01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F03S01",
+      "status": "DANGER",
+      "speech_prob": 99.87683892250061,
+      "nihss_score": 3,
+      "wpm": 108.0,
+      "speech_ratio": 0.422,
+      "file": "wav_headMic_F03S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F03S02",
+      "status": "NORMAL",
+      "speech_prob": 11.616948992013931,
+      "nihss_score": 0,
+      "wpm": 36.0,
+      "speech_ratio": 0.054,
+      "file": "wav_headMic_F03S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F03S03",
+      "status": "DANGER",
+      "speech_prob": 99.46491122245789,
+      "nihss_score": 3,
+      "wpm": 108.0,
+      "speech_ratio": 0.084,
+      "file": "wav_headMic_F03S03_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "F_Dys/wav_headMic_F04S02",
+      "status": "NORMAL",
+      "speech_prob": 2.390877343714237,
+      "nihss_score": 0,
+      "wpm": 72.0,
+      "speech_ratio": 0.042,
+      "file": "wav_headMic_F04S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M01S01",
+      "status": "WARNING",
+      "speech_prob": 57.10034370422363,
+      "nihss_score": 2,
+      "wpm": 72.0,
+      "speech_ratio": 0.482,
+      "file": "wav_arrayMic_M01S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M01S02",
+      "status": "DANGER",
+      "speech_prob": 94.49783563613892,
+      "nihss_score": 3,
+      "wpm": 24.0,
+      "speech_ratio": 0.108,
+      "file": "wav_arrayMic_M01S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M02S01",
+      "status": "DANGER",
+      "speech_prob": 92.40220785140991,
+      "nihss_score": 3,
+      "wpm": 12.0,
+      "speech_ratio": 0.048,
+      "file": "wav_arrayMic_M02S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M02S02",
+      "status": "DANGER",
+      "speech_prob": 98.54991436004639,
+      "nihss_score": 3,
+      "wpm": 144.0,
+      "speech_ratio": 0.193,
+      "file": "wav_arrayMic_M02S02_0074.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M03S02",
+      "status": "DANGER",
+      "speech_prob": 95.6287682056427,
+      "nihss_score": 3,
+      "wpm": 84.0,
+      "speech_ratio": 0.211,
+      "file": "wav_arrayMic_M03S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M04S01",
+      "status": "DANGER",
+      "speech_prob": 95.2610194683075,
+      "nihss_score": 3,
+      "wpm": 12.0,
+      "speech_ratio": 0.669,
+      "file": "wav_arrayMic_M04S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M04S02",
+      "status": "WARNING",
+      "speech_prob": 45.386022329330444,
+      "nihss_score": 1,
+      "wpm": 96.0,
+      "speech_ratio": 0.271,
+      "file": "wav_arrayMic_M04S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_arrayMic_M05S01",
+      "status": "DANGER",
+      "speech_prob": 99.76721405982971,
+      "nihss_score": 3,
+      "wpm": 96.0,
+      "speech_ratio": 0.283,
+      "file": "wav_arrayMic_M05S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M01S01",
+      "status": "DANGER",
+      "speech_prob": 96.56952023506165,
+      "nihss_score": 3,
+      "wpm": 96.0,
+      "speech_ratio": 0.392,
+      "file": "wav_headMic_M01S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M01S02",
+      "status": "DANGER",
+      "speech_prob": 97.93758988380432,
+      "nihss_score": 3,
+      "wpm": 12.0,
+      "speech_ratio": 0.078,
+      "file": "wav_headMic_M01S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M02S01",
+      "status": "DANGER",
+      "speech_prob": 91.06826186180115,
+      "nihss_score": 3,
+      "wpm": 36.0,
+      "speech_ratio": 0.145,
+      "file": "wav_headMic_M02S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M02S02",
+      "status": "NORMAL",
+      "speech_prob": 18.86603832244873,
+      "nihss_score": 0,
+      "wpm": 144.0,
+      "speech_ratio": 0.295,
+      "file": "wav_headMic_M02S02_0074.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M03S02",
+      "status": "NO_SPEECH",
+      "speech_prob": 99.73312616348267,
+      "nihss_score": 0,
+      "wpm": 0.0,
+      "speech_ratio": 0.006,
+      "file": "wav_headMic_M03S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M04S02",
+      "status": "DANGER",
+      "speech_prob": 93.3581531047821,
+      "nihss_score": 3,
+      "wpm": 72.0,
+      "speech_ratio": 0.181,
+      "file": "wav_headMic_M04S02_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M05S01",
+      "status": "DANGER",
+      "speech_prob": 96.09677195549011,
+      "nihss_score": 3,
+      "wpm": 96.0,
+      "speech_ratio": 0.295,
+      "file": "wav_headMic_M05S01_0001.wav"
+    },
+    {
+      "true": "DYS",
+      "session": "M_Dys/wav_headMic_M05S02",
+      "status": "DANGER",
+      "speech_prob": 99.88264441490173,
+      "nihss_score": 3,
+      "wpm": 24.0,
+      "speech_ratio": 0.157,
+      "file": "wav_headMic_M05S02_0001.wav"
+    }
+  ]
+}

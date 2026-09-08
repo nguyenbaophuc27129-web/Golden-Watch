@@ -1,0 +1,162 @@
+{
+  "version": "v2-subject-split",
+  "created": "20260907_210433",
+  "fixes": "L-04: bỏ window-random split (leakage) → LOSO subject-level",
+  "dataset": "Hausdorff JM et al. Gait in Aging and Disease Database v1.0.0. PhysioNet (physionet.org/content/gait-in-aging-and-disease-database/1.0.0/); những người tham gia đi bộ trên thảm lực đo lực thẳng đứng, 15 subject (5 người già khỏe o1-o5, 5 trẻ khỏe y1-y5, 5 Parkinson pd1-pd5).",
+  "n_subjects": 15,
+  "n_windows": 162,
+  "labels": "0 = control (y1-y5, o1-o5), 1 = Parkinson (pd1-pd5)",
+  "limitation": "Parkinson là proxy bất thường dáng đi, KHÔNG phải đột quỵ; tín hiệu thảm lực ≠ video pose (cùng bộ 8 features). Cần kiểm chứng thêm trên video thật.",
+  "hyperparams": {
+    "epochs": 150,
+    "batch": 32,
+    "lr": 0.001,
+    "hidden": [
+      64,
+      32
+    ],
+    "dropout": 0.5,
+    "weight_decay": 0.001,
+    "window": 100,
+    "stride": 50,
+    "seed": 42,
+    "class_weights": true
+  },
+  "loso": {
+    "threshold_youden": 0.1,
+    "sensitivity": {
+      "value": 0.8824,
+      "ci95": [
+        0.6566,
+        0.9671
+      ]
+    },
+    "specificity": {
+      "value": 0.8828,
+      "ci95": [
+        0.8203,
+        0.9255
+      ]
+    },
+    "accuracy": {
+      "value": 0.8827,
+      "ci95": [
+        0.8241,
+        0.9236
+      ]
+    },
+    "roc_auc": 0.884,
+    "subject_level_acc": 0.9333,
+    "folds": [
+      {
+        "test_subject": "y1",
+        "label": 0,
+        "n_windows": 13,
+        "median_prob": 0.02104930207133293,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "y2",
+        "label": 0,
+        "n_windows": 15,
+        "median_prob": 0.011532214470207691,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "y3",
+        "label": 0,
+        "n_windows": 15,
+        "median_prob": 0.005876944400370121,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "y4",
+        "label": 0,
+        "n_windows": 13,
+        "median_prob": 0.018587594851851463,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "y5",
+        "label": 0,
+        "n_windows": 14,
+        "median_prob": 0.026602312922477722,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "o1",
+        "label": 0,
+        "n_windows": 15,
+        "median_prob": 0.009060319513082504,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "o2",
+        "label": 0,
+        "n_windows": 13,
+        "median_prob": 0.9771436452865601,
+        "window_acc": 0.0
+      },
+      {
+        "test_subject": "o3",
+        "label": 0,
+        "n_windows": 16,
+        "median_prob": 0.005243605934083462,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "o4",
+        "label": 0,
+        "n_windows": 16,
+        "median_prob": 0.005364123731851578,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "o5",
+        "label": 0,
+        "n_windows": 15,
+        "median_prob": 0.0063780625350773335,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "pd1",
+        "label": 1,
+        "n_windows": 3,
+        "median_prob": 0.9489520192146301,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "pd2",
+        "label": 1,
+        "n_windows": 4,
+        "median_prob": 0.940750241279602,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "pd3",
+        "label": 1,
+        "n_windows": 3,
+        "median_prob": 0.9999865293502808,
+        "window_acc": 1.0
+      },
+      {
+        "test_subject": "pd4",
+        "label": 1,
+        "n_windows": 4,
+        "median_prob": 0.975042462348938,
+        "window_acc": 0.75
+      },
+      {
+        "test_subject": "pd5",
+        "label": 1,
+        "n_windows": 3,
+        "median_prob": 0.1252114474773407,
+        "window_acc": 0.0
+      }
+    ]
+  },
+  "files": {
+    "model": "gait_classifier_v2_20260907_210433.pth",
+    "scaler": "gait_classifier_v2_20260907_210433_scaler.pkl"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "what": "Đánh giá face_module_v7 RULE-BASED (runtime thật) trên ảnh test",
+  "dataset": "Annotated stroke and non stroke Dataset (công khai) — tập TEST block-split, không leakage frame",
+  "created": "2026-09-07T21:14:11.807309",
+  "n_test_images": 20,
+  "n_valid": 2,
+  "n_no_face_or_error": 18,
+  "n_stroke": 2,
+  "n_nonstroke": 0,
+  "youden_threshold_score": Infinity,
+  "auc": NaN,
+  "sensitivity": {
+    "tp": 0,
+    "fn": 2,
+    "value": 0.0,
+    "ci_low": 0,
+    "ci_high": 0.6576
+  },
+  "specificity": {
+    "tn": 0,
+    "fp": 0,
+    "value": 0.0,
+    "ci_low": 0.0,
+    "ci_high": 0.0
+  },
+  "accuracy": {
+    "value": 0.0,
+    "ci_low": 0,
+    "ci_high": 0.6576
+  },
+  "note": "Youden chọn TRÊN tập test → chỉ mang tính mô tả; kết luận chốt cần thu thêm webcam thật (protocol B).",
+  "per_image_file": "face_rules_eval_20260907_211411.csv",
+  "roc_png": "face_rules_eval_20260907_211411_roc.png"
+}

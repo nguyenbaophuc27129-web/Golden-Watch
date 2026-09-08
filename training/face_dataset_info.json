@@ -1,0 +1,27 @@
+{
+  "dataset_name": "Annotated stroke and non stroke Dataset",
+  "path": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\fga_project\\data\\datasets\\face\\Annotated stroke and non stroke Dataset",
+  "provenance": "Dataset CÔNG KAI (Kaggle) — SỬA lỗi D-11: không phải 'dữ liệu tự thu' như ghi trong README/BANG_CO_SO_KHOA_HOC sheet 2.",
+  "citation": "Kaggle: 'Annotated stroke and non stroke Dataset' — BỔ SUNG URL + tác giả chính xác sau khi tra được (web-search quota reset 13/09/2026). Ghi nguồn này vào báo cáo và BANG_CO_SO_KHOA_HOC.",
+  "counts": {
+    "stroke_images_jpg": 1249,
+    "nonstroke_images_jpg": 2500,
+    "total_images": 3749,
+    "annotation": "YOLO bbox 1 lớp mỗi ảnh (file .txt cùng tên .jpg)"
+  },
+  "labels": {
+    "Stroke": 1,
+    "NonStroke": 0
+  },
+  "known_limitations": [
+    "Không có ID người thật (subject) trong tên file — ảnh là frame trích từ video; đã vá split theo BLOCK 50 số (train_face_model.py) để giảm leakage near-duplicate.",
+    "Nguồn ảnh internet — ánh sáng/góc chụp khác webcam thực tại nhà → cần test cross-domain trên webcam thật (protocol B của Lỗi_ngày.md) trước khi công bố số cuối.",
+    "Frame-level accuracy KHÔNG tương đương person-level accuracy — khi trình bày phải nói rõ 'accuracy ở mức ảnh/frame, n người không xác định được từ dataset'."
+  ],
+  "fix_applied": {
+    "file": "training/train_face_model.py",
+    "change": "Split ảnh ngẫu nhiên → block-aware split (block = dải img_NNNN // 50, kèm nhãn) chống leakage frame liên tiếp",
+    "date": "2026-09-07",
+    "action_required": "CHẠY LẠI training trên RTX3050 để có số liệu mới; thay số 93.75% cũ trong mọi tài liệu bằng số mới + ghi rõ 'block-aware split'"
+  }
+}
