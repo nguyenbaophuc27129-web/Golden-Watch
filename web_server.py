@@ -5,12 +5,14 @@ GOLDEN-WATCH — WEB SERVER GIÁM SÁT THỜI GIAN THỰC (FastAPI, chạy LOCAL
 Lý do thay Streamlit cho video: Streamlit rerun cả script mỗi tick → video
 giật; FastAPI + MJPEG stream = đúng kiểu web camera giám sát (20–30 fps).
 
-Kiến trúc 3 luồng trong 1 process:
-  Thread 1 — CAMERA   : đọc webcam liên tục ~30fps, vẽ khung xương YOLO
+Kiến trúc 4 luồng trong 1 process:
+  Thread 1 — CAMERA   : đọc webcam 720p liên tục ~30fps, vẽ khung xương YOLO
                         từng khung + HUD méo mặt MediaPipe → frame phục vụ
   Thread 2 — RADAR    : LD2450 quét 0.6s/nhịp (không chặn camera)
-  Thread 3 — PHÂN TÍCH: mỗi 2s face/arm/gait → Defense → Fusion → Alert
-                        → NIHSS → Handoff (báo động tức thì vào /api/state)
+  Thread 3 — SPEECH   : NK-32 ghi 5s → ML nói khó + Vosk transcript (lazy
+                        init; kết quả giữ 90s — hết hạn fusion tự bỏ qua)
+  Thread 4 — PHÂN TÍCH: mỗi 2s face/arm/gait (+ speech còn tươi) → Defense
+                        → Fusion → Alert → NIHSS → Handoff (vào /api/state)
 
 Trang web:  http://localhost:5001      (dashboard CCTV + cảnh báo + form)
 Video:      http://localhost:5001/video.mjpg   (MJPEG — mở bằng VLC được)
@@ -132,10 +134,29 @@ STATE = {
     'prev_gray': None,
     'camera_online': False,
     'analysis_count': 0,
+    'speech_result': None,      # NK-32: kết quả speech gần nhất (thread 3)
+    'speech_ts': 0.0,           # time.time() lúc có kết quả
+    'speech_note': '',          # "im lang — dang nghe" / lỗi
+    'speech_error': None,
 }
 CAM_LOCK = threading.Lock()
 RADAR_LOCK = threading.Lock()
 ANALYSIS_LOCK = threading.Lock()
+
+_WARN_TS = {}
+_WARN_LOCK = threading.Lock()
+
+
+def _rate_warn(key, msg, period_s=30):
+    """NK-32: in cảnh báo tối đa 1 lần/period — chẩn đoán được lỗi lặp
+    (trước đây draw_live_pose nuốt exception im lặng, không phân biệt được
+    'không phát hiện' với 'văng exception')."""
+    now = time.time()
+    with _WARN_LOCK:
+        if now - _WARN_TS.get(key, 0) < period_s:
+            return
+        _WARN_TS[key] = now
+    print(f'[WARN {key}] {msg}')
 
 # ------------------------------------------------------------------
 # MOBILE ALERT (NK-25): kênh sự kiện đẩy sang app điện thoại (PWA).
@@ -285,8 +306,8 @@ def draw_live_pose(frame, conf=0.25):
                     f'NGUOI: {n_people}  DIEM CO THE: {n_pts}/{n_people * 17}',
                     (w - 300, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     (80, 220, 80), 1)
-    except Exception:
-        pass
+    except Exception as e:
+        _rate_warn('yolo_draw', f'draw_live_pose: {e!r}', 30)
     return frame
 
 
@@ -388,8 +409,13 @@ def draw_arm_panel(frame):
 # ======================================================================
 def camera_worker():
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    # NK-32: 720p — mặt người ngồi cách 3–4m tăng từ ~40–60px (640x480) lên
+    # ~80–120px → MediaPipe khóa được; YOLO imgsz 480 giữ nguyên (letterbox,
+    # chi phí KHÔNG đổi theo độ phân giải capture). BUFFERSIZE 1 = luôn xử
+    # lý khung MỚI NHẤT, không dồn trễ khi đường vẽ chậm.
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     if not cap.isOpened():
         STATE['cam_error'] = 'Không mở được webcam'
         return
@@ -404,30 +430,35 @@ def camera_worker():
         STATE['cam_error'] = None
         STATE['camera_online'] = True
         frame = cv2.flip(frame, 1)
-        # vẽ khung xương YOLO từng khung (real-time)
-        frame = draw_live_pose(frame)
-        # NK-28: mặt REAL-TIME — detector riêng chạy mỗi khung chẵn:
-        # mặt hiện ở đâu là khóa ngay (<100ms), không chờ chu kỳ 2s
-        frame_idx += 1
-        if frame_idx % 2 == 0:
-            try:
-                STATE['face_live'] = FACE_LIVE.process_frame(frame)
-            except Exception:
-                pass
-        # HUD mặt: ưu tiên live có mặt; vắng thì dùng kết quả chu kỳ 2s
-        # (giữ HOLD 3s — mặt thoáng qua không nhấp nháy HUD)
-        live = STATE.get('face_live')
-        with ANALYSIS_LOCK:
-            cached = STATE.get('hud_face')
-        if live is not None and live.get('raw_landmarks') is not None:
-            hud = live
-        elif cached is not None and cached.get('raw_landmarks') is not None:
-            hud = cached
-        else:
-            hud = live if live is not None else cached
-        if hud:
-            frame = draw_face_hud(frame, hud)
-        draw_arm_panel(frame)
+        # NK-32: toàn bộ khối vẽ bọc try/except — HUD/xương vẽ hỏng chỉ
+        # mất overlay, KHÔNG được giết thread camera (đóng băng video).
+        try:
+            # vẽ khung xương YOLO từng khung (real-time)
+            frame = draw_live_pose(frame)
+            # NK-28: mặt REAL-TIME — detector riêng chạy mỗi khung chẵn:
+            # mặt hiện ở đâu là khóa ngay (<100ms), không chờ chu kỳ 2s
+            frame_idx += 1
+            if frame_idx % 2 == 0:
+                try:
+                    STATE['face_live'] = FACE_LIVE.process_frame(frame)
+                except Exception as e:
+                    _rate_warn('face_live', f'FACE_LIVE: {e!r}', 30)
+            # HUD mặt: ưu tiên live có mặt; vắng thì dùng kết quả chu kỳ 2s
+            # (giữ HOLD 3s — mặt thoáng qua không nhấp nháy HUD)
+            live = STATE.get('face_live')
+            with ANALYSIS_LOCK:
+                cached = STATE.get('hud_face')
+            if live is not None and live.get('raw_landmarks') is not None:
+                hud = live
+            elif cached is not None and cached.get('raw_landmarks') is not None:
+                hud = cached
+            else:
+                hud = live if live is not None else cached
+            if hud:
+                frame = draw_face_hud(frame, hud)
+            draw_arm_panel(frame)
+        except Exception as e:
+            _rate_warn('cam_draw', f'overlay camera: {e!r}', 30)
         with CAM_LOCK:
             STATE['cam_frame'] = frame.copy()
         time.sleep(0.03)
@@ -450,7 +481,71 @@ def radar_worker():
 
 
 # ======================================================================
-# THREAD 3 — PHÂN TÍCH (mỗi 2 giây)
+# THREAD 3 — SPEECH (NK-32: module thứ 5 vào web — nghe liên tục)
+# ======================================================================
+SPEECH_LOCK = threading.Lock()
+_SPEECH = None          # SpeechAnalysisModule — lazy init TRONG thread
+
+
+def _speech_fresh():
+    """Kết quả speech còn tươi (≤90s): trả (result, age_s); hết hạn/không có
+    → None. Fusion nhận speech = tự cân lại trọng số (bỏ 0.20 speech)."""
+    with SPEECH_LOCK:
+        r = STATE.get('speech_result')
+        ts = STATE.get('speech_ts') or 0.0
+    if not r or not ts:
+        return None
+    age = time.time() - ts
+    if age > 90:
+        return None
+    return r, round(age, 1)
+
+
+def speech_worker():
+    """Ghi 5s → phân tích 1 cửa sổ 5s → ngủ 5s (~12s/nhịp). Lazy init ở
+    ĐẦU thread: nạp vosk 168MB + torch KHÔNG chặn mở dashboard; đúng 3 path
+    production như app_family (KHÔNG dùng speech_torgo_full — NK-12)."""
+    global _SPEECH
+    while True:
+        try:
+            if _SPEECH is None:
+                from detection.speech_module_v2 import SpeechAnalysisModule
+                _SPEECH = SpeechAnalysisModule(
+                    vosk_model_path=os.path.join(MODELS, 'vosk-model-vn-0.4'),
+                    ml_model_path=os.path.join(
+                        MODELS, 'speech_torgo_20260828_211130.pth'),
+                    scaler_path=os.path.join(
+                        MODELS, 'speech_torgo_20260828_211130_scaler.pkl'))
+                _SPEECH.load_baseline(os.path.join(
+                    PROJECT_ROOT, 'data', 'baselines', 'user_default.json'))
+                STATE['speech_error'] = None
+                STATE['speech_note'] = 'dang nghe…'
+                print('[SPEECH] Sẵn sàng (vosk + ML) — nghe liên tục')
+            audio = _SPEECH.record_audio(5)
+            r = _SPEECH.predict_dysarthria(audio, 5)
+            if r.get('status') == 'NO_SPEECH':
+                # Nói khó là triệu chứng DAI DẲNG — KHÔNG xóa kết quả cũ,
+                # giữ đến khi hết hạn 90s (fusion tự bỏ qua), chỉ ghi chú.
+                with SPEECH_LOCK:
+                    STATE['speech_note'] = 'im lang — dang nghe'
+            else:
+                with SPEECH_LOCK:
+                    STATE['speech_result'] = r
+                    STATE['speech_ts'] = time.time()
+                    STATE['speech_note'] = ''
+                STATE['speech_error'] = None
+        except Exception as e:
+            STATE['speech_error'] = str(e)
+            with SPEECH_LOCK:
+                STATE['speech_note'] = 'loi — thu lai sau 30s'
+            _rate_warn('speech', f'speech_worker: {e!r}', 30)
+            time.sleep(30)   # lỗi init/mic → chờ 30s (cắm mic sau tự lành)
+            continue
+        time.sleep(5)
+
+
+# ======================================================================
+# THREAD 4 — PHÂN TÍCH (mỗi 2 giây)
 # ======================================================================
 def analysis_worker():
     while True:
@@ -487,7 +582,12 @@ def run_analysis_cycle(frame):
                                             'metrics': {}}
     radar_r.setdefault('metrics', {})['simulation'] = \
         STATE['radar'].simulation
-    STATE['radar'].set_audio_flag(False)   # speech test ở app Streamlit
+    # NK-32: cổng audio THẬT (ngữ nghĩa fall-AND-audio như app_family) —
+    # radar chỉ nhận "âm thanh bất thường" khi speech còn tươi (≤90s)
+    # VÀ điểm nói khó ≥ 30.
+    sp_fresh = _speech_fresh()
+    STATE['radar'].set_audio_flag(
+        bool(sp_fresh and sp_fresh[0].get('speech_prob', 0) >= 30))
 
     ts = time.strftime('%H:%M:%S')
     STATE['radar_history'].append({
@@ -497,10 +597,19 @@ def run_analysis_cycle(frame):
         'Chế độ': 'SIM' if STATE['radar'].simulation else 'LIVE'})
 
     mods = {'face': face_r, 'arm': arm_r, 'gait': gait_r, 'radar': radar_r}
+    if sp_fresh:
+        mods['speech'] = sp_fresh[0]   # hết hạn → không đưa, fusion tự cân
     filtered, audit = DEFENSE.filter(mods)
     fused = FUSION.fuse(filtered)
     verdict = DEFENSE.verdict(fused['fused_score'])
     fused['trend'] = verdict['trend']
+
+    # ----- NIHSS (NK-32 BUG A: tính TRƯỚC khối ALERT — trước đây biến nih
+    # được dùng ở push alert TRƯỚC khi gán → UnboundLocalError MỌI chu kỳ
+    # có cảnh báo, bị try/except ngoài nuốt → PROFILE.record + STATE +
+    # heartbeat mobile bị BỎ đúng lúc báo động) -----
+    nih = estimate_nihss(filtered)
+    nih.update(calculate_nihss_ci(filtered, n_iter=300))
 
     # ----- ALERT -----
     alert_pushed = False
@@ -526,20 +635,8 @@ def run_analysis_cycle(frame):
                                            if isinstance(nih, dict) else None))
             alert_pushed = True
 
-    # ----- NIHSS + Handoff events -----
-    nih = estimate_nihss(filtered)
-    nih.update(calculate_nihss_ci(filtered, n_iter=300))
-    HANDOFF.add_event('CYCLE', f'score={fused["fused_score"]} '
-                               f'risk={fused["risk_level"]}')
-    if alert_pushed:
-        # NIHSS tính xong sau alert — cập nhật thêm NIHSS vào event báo động
-        push_mobile_event('alert_nihss', level=fused['risk_level'],
-                          nihss_total=nih.get('total'),
-                          nihss_margin=nih.get('margin'))
-
-    # ----- NIHSS + Handoff events -----
-    nih = estimate_nihss(filtered)
-    nih.update(calculate_nihss_ci(filtered, n_iter=300))
+    # NK-32 BUG B: trước đây khối NIHSS + CYCLE bị LẶP 2 lần (CYCLE ghi
+    # trùng, bootstrap NIHSS tính 2 lần/chu kỳ) — giờ ĐÚNG 1 event/chu kỳ.
     HANDOFF.add_event('CYCLE', f'score={fused["fused_score"]} '
                                f'risk={fused["risk_level"]}')
 
@@ -555,6 +652,27 @@ def run_analysis_cycle(frame):
             print(f"[PROFILE] Đủ {PROFILE.DAYS} ngày — baseline cá nhân "
                   f"áp dụng: {base}")
 
+    # ----- Speech entry cho UI (đọc 1 lần dưới SPEECH_LOCK) -----
+    with SPEECH_LOCK:
+        sr = STATE.get('speech_result')
+        s_ts = STATE.get('speech_ts') or 0.0
+        s_note = STATE.get('speech_note')
+        s_err = STATE.get('speech_error')
+    if sr:
+        s_age = round(time.time() - s_ts, 1)
+        s_m = sr.get('metrics') or {}
+        speech_mod = {
+            'status': sr.get('status', '?'),
+            'score': round(float(sr.get('speech_prob', 0) or 0), 1),
+            'wpm': s_m.get('wpm'), 'words': s_m.get('word_count'),
+            'transcript': s_m.get('transcript'),
+            'age_s': s_age, 'stale': s_age > 90,
+            'note': s_note, 'error': s_err}
+    else:
+        speech_mod = {'status': 'NO_DATA', 'score': 0.0, 'wpm': None,
+                      'words': None, 'transcript': None, 'age_s': None,
+                      'stale': True, 'note': s_note, 'error': s_err}
+
     with ANALYSIS_LOCK:
         STATE['hud_face'] = dict(face_r)
         STATE['arm_metrics'] = arm_r.get('metrics') or {}
@@ -569,6 +687,7 @@ def run_analysis_cycle(frame):
             'radar': {'status': radar_r['status'],
                       'score': round(float(
                           radar_r['metrics'].get('fall_prob', 0) or 0), 1)},
+            'speech': speech_mod,
         }
         STATE['fused_score'] = round(float(fused['fused_score']), 1)
         STATE['risk_level'] = fused['risk_level']
@@ -887,6 +1006,14 @@ PAGE_HTML = """<!DOCTYPE html>
         Chu kỳ phân tích: <span id="cycles">0</span></div>
     </div>
     <div class="card" style="margin-top:14px">
+      <b>🗣️ Giọng nói — liên tục</b>
+      <div id="speech" style="margin-top:6px;font-size:13px;line-height:1.6">
+        <span style="color:var(--mut)">Đang khởi động (nạp vosk + ML vài
+        giây)…</span></div>
+      <div class="cap">Ghi 5s mỗi ~12s · kết quả giữ 90s rồi fusion tự bỏ ·
+        Nói khó ≥30% = cảnh giác (KHÔNG chẩn đoán)</div>
+    </div>
+    <div class="card" style="margin-top:14px">
       <b>🧩 Ước tính NIHSS (4 item — tối đa 13)</b>
       <div style="font-size:24px;margin-top:6px" id="nihss">—</div>
       <div class="cap" id="nihssnote">UỚC LƯỢNG HỖ TRỢ — bác sĩ chấm chuẩn</div>
@@ -974,12 +1101,30 @@ async function tick(){
     document.getElementById('cycles').textContent = s.analysis_count;
     const mods = document.getElementById('mods'); mods.innerHTML = '';
     const name = {face:'Méo mặt (MediaPipe)',arm:'Tay yếu (YOLO)',
-      gait:'Dáng đi (YOLO)',radar:'Radar LD2450'};
+      gait:'Dáng đi (YOLO)',radar:'Radar LD2450',speech:'Giọng nói'};
     for (const k in s.modules){
       const m = s.modules[k];
       mods.innerHTML += `<div class="mod"><span>${name[k]||k}</span>
         <span><span class="st-${esc(m.status)}">${esc(m.status)}</span>
         &nbsp;${m.score}/100</span></div>`;
+    }
+    const sp = (s.modules||{}).speech;
+    if (sp){
+      const stale = sp.stale;
+      const col = stale ? 'var(--mut)' :
+        ({NORMAL:'var(--grn)',WARNING:'var(--ylw)',
+          DANGER:'var(--red)'}[sp.status]||'var(--mut)');
+      let h = '<span style="color:'+col+';font-weight:700">'+esc(sp.status)
+        +(stale?' (hết hạn — fusion bỏ)':'')+'</span> — điểm <b>'
+        +(sp.score??0)+'/100</b> · '+(sp.wpm??'—')+' từ/phút · '
+        +(sp.words??'—')+' từ';
+      if (sp.age_s!=null) h += ' · cách đây '+sp.age_s+'s';
+      if (sp.note) h += '<br><span style="color:var(--mut)">'
+        +esc(sp.note)+'</span>';
+      if (sp.error) h += '<br><span style="color:var(--red)">Lỗi: '
+        +esc(sp.error)+'</span>';
+      if (sp.transcript) h += '<br>🎙️ “'+esc(sp.transcript)+'”';
+      document.getElementById('speech').innerHTML = h;
     }
     if (s.nihss){
       document.getElementById('nihss').textContent =
@@ -1154,7 +1299,8 @@ function paint(st){ // vẽ trạng thái thường
   const p=st.patient||{};
   $('pt').textContent=p.name?('Người giám sát: '+p.name
     +(p.age?(' · '+p.age+' tuổi'):'')):'Chưa nhập người bệnh';
-  const nm={face:'Méo mặt',arm:'Tay yếu',gait:'Dáng đi',radar:'Radar'};
+  const nm={face:'Méo mặt',arm:'Tay yếu',gait:'Dáng đi',radar:'Radar',
+    speech:'Giong noi'};
   const cl=s=>s==='NORMAL'?'g':(s==='WARNING'||s==='MONITOR')?'y':'r';
   let h='';for(const k in st.modules||{}){const m=st.modules[k];
     h+='<div class="mod"><span>'+esc(nm[k]||k)+'</span><span class="'
@@ -1217,6 +1363,7 @@ def main():
 
     threading.Thread(target=camera_worker, daemon=True).start()
     threading.Thread(target=radar_worker, daemon=True).start()
+    threading.Thread(target=speech_worker, daemon=True).start()
     threading.Thread(target=analysis_worker, daemon=True).start()
 
     import uvicorn

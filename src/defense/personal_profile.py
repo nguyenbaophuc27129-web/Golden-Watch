@@ -122,7 +122,10 @@ class PersonalProfile:
 
         st = self.status()
         # đủ 3 ngày → flush lần cuối
-        if st['day'] >= self.DAYS and st['days_ok']:
+        # (L-36: trước đây đọc st['days_ok'] — status() trả 'done' → ngày
+        # thứ 3 trở đi KeyError MỌI chu kỳ, dashboard đóng băng đúng lúc
+        # học xong; ngày 1–2 chỉ may nhờ short-circuit của `and`)
+        if st['day'] >= self.DAYS and st['done']:
             self._flush_today()
             st = self.status()
         return st

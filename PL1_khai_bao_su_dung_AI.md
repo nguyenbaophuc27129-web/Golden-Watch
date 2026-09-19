@@ -1,8 +1,9 @@
 # PHỤ LỤC 1 — KHAI BÁO SỬ DỤNG TRÍ TUỆ NHÂN TẠO (AI)
 
 **Cuộc thi:** Khoa học Kỹ thuật cấp Thành phố TP.HCM, năm học 2026–2027
-**Tên dự án:** Golden-Watch — Hệ thống sàng lọc tiền bệnh viện đột quỵ PSCS
-đa cảm biến (nhận diện khuôn mặt · giọng nói · yếu tay · dáng đi · radar)
+**Tên dự án:** Golden Watch — Hệ giám sát đa cảm biến không đeo phát hiện
+sớm đột quỵ tại nhà và kiểm soát báo động giả
+(5 tín hiệu: khuôn mặt · giọng nói · tay · dáng đi · radar)
 **Họ tên học sinh:** ......................................................
 **Lớp / Trường:** ......................................................
 **Giáo viên hướng dẫn:** ......................................................

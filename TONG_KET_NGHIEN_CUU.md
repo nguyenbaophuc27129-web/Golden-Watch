@@ -1,7 +1,8 @@
 # TỔNG KẾT NGHIÊN CỨU — GOLDEN-WATCH 3.0 (HỆ GIÁM SÁT TỰ TIN)
 
-> Phiên bản 1.0 — 12/09/2026 · Dự án: **Golden-Watch — Hệ thống phát hiện sớm
-> đột quỵ đa mô hình tại nhà (PSCS)** · Lĩnh vực 5: Kỹ thuật Y Sinh.
+> Phiên bản 1.0 — 12/09/2026 · Dự án: **Golden Watch — Hệ giám sát đa cảm biến
+> không đeo phát hiện sớm đột quỵ tại nhà và kiểm soát báo động giả** ·
+> Lĩnh vực 5: Kỹ thuật Y Sinh.
 > Mọi số liệu trong tài liệu là SỐ THẬT từ các protocol đã khóa, chi tiết tại
 > `so_nhat_ky.md` (NK-01→NK-12) + `BANG_THANG_DO_KIEM_DINH.md`.
 > Mục tiêu thi: Giải Nhất TP.HCM → đại diện TP.HCM dự KHKT quốc gia → giải Nhì quốc gia.

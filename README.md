@@ -1,4 +1,4 @@
-# PSCS Golden-Watch v8.0
+# Golden Watch — Hệ giám sát đa cảm biến không đeo phát hiện sớm đột quỵ tại nhà và kiểm soát báo động giả
 
 **Pre-hospital Stroke Care System** — Hệ thống sàng lọc tiền viện hỗ trợ phát hiện
 sớm đột quỵ bằng AI, cho người cao tuổi tại nhà. Dự án nghiên cứu khoa học kỹ

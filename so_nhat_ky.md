@@ -761,3 +761,99 @@ thiếu sót đã đo và khai báo"; mọi số truy vết JSON; mọi thay đ�
 
 **Việc chờ:** Task #10 (smoke MP4 qua toolkit NK-05) và #11 (nạp video
 YouTube) chờ user nộp dữ liệu; git commit chờ user OK.
+
+## NK-31 — 19/09/2026 · CHỐT TÊN ĐỀ TÀI THỐNG NHẤT + COMMIT BẢN AN TOÀN + DỜI NGÀY THU DỮ LIỆU
+
+**1. Git commit `d0749aa` "Buoi 7 (16–17/09)" — bản an toàn:** 106 file,
++21,981 dòng — toàn bộ NK-24→30 (stat tests NK-24, PWA mobile NK-25, fix
+L-35 NK-26, vosk NK-27, HUD mesh + arm panel NK-28, DU_CU + kit 3 ngày
+NK-29/30, trụ A/B, 10 script training/eval). `models/vosk-model-vn-0.4/`
+(168MB, model bên thứ ba — copy lại từ fga_project được) đưa vào
+`.gitignore`; mọi thứ khác vào repo. Working tree sạch sau commit.
+
+**2. Thu dữ liệu 18/09 BỊ HOÃN** — `data/thu_tu_lieu/` hiện chỉ có 2 CSV
+mẫu. Cần chọn ngày thu mới; các eval NK-18→21 + Protocol B rút gọn dời
+theo. Đơn đồng ý + quy trình thu giữ nguyên từ KE_HOACH_3_NGAY.md.
+
+**3. Chốt tên đề tài THỐNG NHẤT (đội chọn phương án ngắn):**
+> **Golden Watch — Hệ giám sát đa cảm biến không đeo phát hiện sớm đột
+> quỵ tại nhà và kiểm soát báo động giả**
+
+Lý do đổi khỏi tên sổ cũ ("...qua tín hiệu vận động và cơ chế kiểm soát
+báo động giả 4 lớp"): (a) "tín hiệu vận động" không bao hết speech +
+radar; (b) thiếu "không đeo" — khác biệt cốt lõi so wearable; (c) thiếu
+"tại nhà"; (d) "giám sát sức khỏe" quá rộng. "4 lớp" để báo cáo nói,
+không đưa vào tên. Đã thay ở 5 file: `NHAT_KY_DU_AN.md` (trang bìa),
+`BAO_CAO_DU_AN.md`, `TONG_KET_NGHIEN_CUU.md`, `PL1_khai_bao_su_dung_AI.md`,
+`README.md`. GIỮ NGUYÊN 2 file lưu vết `NHAT_KY_DU_AN_v1_recovered.md` +
+`TONG_QUAN_DU_AN_FINAL.md` (bản lưu lịch sử). Nếu phỏng vấn hỏi "Watch
+mà không đeo?": Watch = canh giác/giám sát, không phải đồng hồ đeo.
+
+## NK-32 — 19/09/2026 · WEB ĐỦ 5/5 MODULE (SPEECH ONLINE) + 720P + SỬA 2 BUG CHU KỲ BÁO ĐỘNG + L-36
+
+**1. Speech vào web (`web_server.py`, thread 3 mới — kiến trúc 3→4 luồng):**
+lazy init NGAY TRONG thread (dashboard mở được tức thì, vosk 168MB + torch
+nạp nền sau); đúng 3 path production như app_family (`vosk-model-vn-0.4` +
+`speech_torgo_20260828_211130.pth` + scaler — KHÔNG dùng bản full NK-12) +
+`load_baseline(data/baselines/user_default.json)`; chu kỳ ghi 5s → phân tích
+1 cửa sổ 5s → ngủ 5s (~12s/nhịp, bù nhịp dày hơn median-3-cửa-sổ của
+app_family); lỗi init/mic → note + thử lại sau 30s (cắm mic sau tự lành);
+NO_SPEECH KHÔNG xóa kết quả cũ (nói khó là triệu chứng dai dẳng) — giữ đến
+hết hạn 90s, chỉ ghi "im lang — dang nghe". Smoke thật: vosk load OK, AGC
+chạy, có transcript Vosk, speech THẬT SỰ vào fusion (log alert thấy
+R1: 2/3 FAST "(arm, speech)").
+
+**2. Camera 720p + chống trễ + bảo vệ thread:** `cap.set` 1280×720 +
+`CAP_PROP_BUFFERSIZE=1` (luôn khung mới nhất) — mặt cách 3–4m tăng ~40–60px
+lên ~80–120px để MediaPipe khóa được; YOLO imgsz GIỮ 480 (letterbox — chi
+phí không đổi theo độ phân giải capture); toàn bộ khối vẽ bọc try/except +
+`_rate_warn()` (in tối đa 1 lần/30s) — HUD hỏng không giết thread camera;
+`draw_live_pose` trước đây nuốt exception IM LẶNG (không phân biệt được
+"không phát hiện" với "văng lỗi") → giờ in lỗi rate-limit 30s để chẩn đoán.
+
+**3. BUG A (nghiêm trọng, đúng kế hoạch):** `push_mobile_event('alert',
+nihss_total=nih.get('total'))` dùng biến `nih` TRƯỚC khi gán (NIHSS tính ở
+dưới) → `UnboundLocalError` ở MỌI chu kỳ có cảnh báo, bị try/except của
+`analysis_worker` nuốt sạch → HANDOFF + đẩy mobile + `PROFILE.record` +
+cập nhật STATE + heartbeat mobile BỎ — dashboard đóng băng ĐÚNG LÚC BÁO
+ĐỘNG. Fix: chuyển `nih = estimate_nihss(filtered)` + CI bootstrap lên
+TRƯỚC khối ALERT (giờ alert mang NIHSS thật ngay lần đầu).
+
+**4. BUG B:** khối NIHSS + `HANDOFF.add_event('CYCLE')` bị LẶP 2 lần →
+CYCLE ghi trùng + bootstrap NIHSS tính 2 lần mỗi chu kỳ. Fix: giữ ĐÚNG
+1 CYCLE/chu kỳ, xóa luôn push `alert_nihss` (nhánh JS mobile giữ nguyên —
+vô hại, không còn được gửi tới).
+
+**5. L-36 (phát hiện NGAY LÚC smoke, ngoài kế hoạch —
+`src/defense/personal_profile.py`):** `record()` đọc `st['days_ok']` nhưng
+`status()` trả về khóa `'done'` → ngày 1–2 chỉ MAY NHỜ short-circuit của
+`and` (`st['day'] >= 3` là False); 19/09 đủ ngày thứ 3 → `KeyError:
+'days_ok'` ở MỌI chu kỳ (801 lần trong log smoke) → web đóng băng hoàn toàn,
+modules rỗng. Fix 1 từ: `st['done']`. Sau fix: profile **day 3, done=true,
+applied=true** — chế độ học 3 ngày tự hoàn thành và calibrate Defense L4
+LẦN ĐẦU TIÊN chạy trọn vẹn trong production.
+
+**6. Nối speech vào chu kỳ phân tích:** `set_audio_flag` THẬT (trước đây
+False cứng "speech test ở app Streamlit"): speech tươi ≤90s VÀ prob ≥30 —
+đúng ngữ nghĩa fall-AND-audio như app_family; `mods['speech']` chỉ đưa khi
+còn tươi — hết hạn fusion tự cân lại trọng số (face .20/speech .20/arm
+.30/gait .15/radar .15 — fusion/defense/NIHSS không sửa gì); dashboard thêm
+thẻ "🗣️ Giọng nói — liên tục" (status, điểm /100, từ/phút, số từ, tuổi kết
+quả, transcript Vosk escape HTML), JS name map thêm `speech`; mobile PWA
+`nm` thêm `speech:'Giong noi'` (snapshot WS tự mang nguyên khối modules).
+
+**7. Smoke thật sau fix:** 5/5 module hiện đủ; nhịp chu kỳ 2.2s chuẩn
+(20s → +9 chu kỳ); 0 lỗi [ANALYSIS]; radar SIM đổi scenario OK; scenario
+ngã/alert → `last_alert` WARNING 55.0 chạy qua nhánh BUG A KHÔNG crash,
+NIHSS item10_dysarthria=2 từ speech, `analysis_count` tiếp tục tăng.
+
+**8. Hồi quy (server TẮT trước test mobile):** `test_sys14b_regression.py`
+**10/10** + `test_all_metrics.py` **58/58** + `test_mobile_alert.py` **8/8**
+PASS. Model/ngưỡng/conf mặt KHÔNG đổi — model đóng băng NK-12 giữ nguyên.
+
+**9. Quan sát demo (chưa sửa — chờ người nói thật):** mic laptop để xa →
+AGC khếch đại cả tiếng ồn nền (peak 0.000 → x4915) cho speech DANGER 98.4
+GIẢ + Vosk "bịa" từ trên nhiễu — demo phải để người nói gần mic; gait
+WARNING 50 khi đối tượng NGỒI (pose chập người) — chuẩn bị lời giải thích
+khi phỏng vấn. Việc commit cuối ngày gồm cả đổi tên đề tài + NK-31/32
+(theo dặn để cuối ngày 19/09).

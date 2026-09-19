@@ -7,7 +7,7 @@
 
 ## TRANG BÌA (trang 1)
 - Lĩnh vực: **5 — Kỹ thuật Y Sinh** (Thiết bị Y Sinh)
-- Tên: Golden-Watch — Hệ thống phát hiện sớm đột quỵ đa mô hình tại nhà (PSCS)
+- Tên: Golden Watch — Hệ giám sát đa cảm biến không đeo phát hiện sớm đột quỵ tại nhà và kiểm soát báo động giả
 - Người thực hiện / người bảo trợ / người hướng dẫn / thời gian–địa điểm
   [ĐIỀN: tên đội, GVHD, thời gian nghiên cứu 01/2026→10/2026 — phải khớp sổ nhật ký]
 

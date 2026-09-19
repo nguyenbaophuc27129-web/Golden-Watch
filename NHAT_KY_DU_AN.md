@@ -14,8 +14,8 @@
 
 ## TRANG BÌA
 
-- **Tên đề tài:** Golden Watch — Hệ thống giám sát sức khỏe đa cảm biến phát
-  hiện sớm đột quỵ qua tín hiệu vận động và cơ chế kiểm soát báo động giả 4 lớp
+- **Tên đề tài:** Golden Watch — Hệ giám sát đa cảm biến không đeo phát hiện
+  sớm đột quỵ tại nhà và kiểm soát báo động giả
 - **Tên học sinh:** Nguyễn Bảo Phúc, Hồ Ngọc Thanh Vân
 - **Trường:** THPT Dương Văn Thì
 - **Giáo viên hướng dẫn:** Dương Nguyễn Yến Khoa
