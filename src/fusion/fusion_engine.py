@@ -56,11 +56,18 @@ class FusionEngine:
         'NO_SPEECH', 'NO_DETECTOR', 'NO_MODEL', 'ERROR'
     }
 
-    def __init__(self, weights=None, history_size=100):
+    def __init__(self, weights=None, history_size=100, abstain=False,
+                 abstain_unc_threshold=0.6):
         self.weights = dict(self.DEFAULT_WEIGHTS)
         if weights:
             self.weights.update(weights)
         self.history = deque(maxlen=history_size)
+        # Trụ cột A (NK-10): abstention — mặc định TẮT (fallback = hệ cũ).
+        # Bật → module báo 'uncertainty' (0-1) sẽ được gộp; bất định quá
+        # ngưỡng → needs_check=True (người xác nhận). KHÔNG BAO GIỜ hạ
+        # cấp EMERGENCY (an toàn trước, đúng triết lý L-08).
+        self.abstain = bool(abstain)
+        self.abstain_unc_threshold = float(abstain_unc_threshold)
 
     # ------------------------------------------------------------------
     # 1. ADAPTER: chuẩn hóa output các module về cùng một format
@@ -90,8 +97,10 @@ class FusionEngine:
             return None
 
         valid = status not in self.INVALID_STATUSES
+        unc = result.get('uncertainty')   # tùy chọn (trụ cột A, NK-10)
         return {'prob': float(prob), 'status': status,
-                'nihss': int(nihss), 'valid': valid}
+                'nihss': int(nihss), 'valid': valid,
+                'uncertainty': None if unc is None else float(unc)}
 
     # ------------------------------------------------------------------
     # 2. FUSION CHÍNH
@@ -162,6 +171,29 @@ class FusionEngine:
         elif fused_score >= 30:
             risk_level = 'MONITOR'
 
+        # ----- 4b. ABSTENTION (trụ cột A, NK-10 — chỉ khi bật flag) -----
+        # Gộp uncertainty các module (trung bình có trọng số như điểm).
+        # Bất định cao + CHƯA phải EMERGENCY → needs_check (người xác nhận).
+        # EMERGENCY luôn đi qua nguyên vẹn — không bao giờ bị hạ cấp.
+        needs_check = False
+        fused_uncertainty = None
+        if self.abstain:
+            unc_vals = [(k, v['uncertainty']) for k, v in used.items()
+                        if v.get('uncertainty') is not None]
+            if unc_vals:
+                total_wu = sum(self.weights.get(k, 0.15) for k, _ in unc_vals)
+                if total_wu > 0:
+                    fused_uncertainty = round(sum(
+                        self.weights.get(k, 0.15) * u
+                        for k, u in unc_vals) / total_wu, 3)
+                if (fused_uncertainty is not None
+                        and fused_uncertainty > self.abstain_unc_threshold
+                        and risk_level != 'EMERGENCY'):
+                    needs_check = True
+                    triggered_rules.append(
+                        f"ABSTAIN: do bat dinh {fused_uncertainty} > "
+                        f"{self.abstain_unc_threshold} — can nguoi xac nhan")
+
         # ----- 5. NIHSS ƯỚC TÍNH (tổng các item có sẵn) -----
         nihss_items = {}
         nihss_map = {'face': 'item4_facial_palsy', 'arm': 'item5_motor_arm',
@@ -183,7 +215,11 @@ class FusionEngine:
                              for k, v in used.items()},
             'modules_skipped': skipped,
             'triggered_rules': triggered_rules,
-            'recommendation': self._recommendation(risk_level),
+            'needs_check': needs_check,
+            'fused_uncertainty': fused_uncertainty,
+            'recommendation': self._recommendation(risk_level)
+                              + (' - CAN NGUOI KIEM TRA LAI'
+                                 if needs_check else ''),
             'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
         }
 

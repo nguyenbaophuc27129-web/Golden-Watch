@@ -1,0 +1,21 @@
+{"timestamp": "2026-09-10 20:49:53", "session_id": "982a413d", "level": "INFO", "score": 10, "message": "risk=NORMAL score=10 - khong bao dong", "source": "fusion", "extra": {}}
+{"timestamp": "2026-09-10 20:49:53", "session_id": "982a413d", "level": "INFO", "score": 40, "message": "risk=MONITOR score=40 - khong bao dong", "source": "fusion", "extra": {}}
+{"timestamp": "2026-09-10 20:49:53", "session_id": "982a413d", "level": "WARNING", "score": 60, "message": "Canh bao: score=60, NIHSS~0. ", "source": "fusion", "extra": {"risk": "WARNING", "nihss": 0}}
+{"timestamp": "2026-09-10 20:49:53", "session_id": "982a413d", "level": "EMERGENCY", "score": 85, "message": "NGUY CO DOT QUY CA! score=85, NIHSS~0. Quy tac: []", "source": "fusion", "extra": {"risk": "EMERGENCY", "nihss": 0}}
+{"timestamp": "2026-09-10 20:49:53", "session_id": "982a413d", "level": "EMERGENCY", "score": 95, "message": "score cao risk thấp", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 20:49:53", "session_id": "297c12c0", "level": "WARNING", "score": 55, "message": "warn 1", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 20:49:53", "session_id": "297c12c0", "level": "EMERGENCY", "score": 90, "message": "emergency ngay sau warning", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 22:09:12", "session_id": "68d3ace1", "level": "INFO", "score": 10, "message": "risk=NORMAL score=10 - khong bao dong", "source": "fusion", "extra": {}}
+{"timestamp": "2026-09-10 22:09:12", "session_id": "68d3ace1", "level": "INFO", "score": 40, "message": "risk=MONITOR score=40 - khong bao dong", "source": "fusion", "extra": {}}
+{"timestamp": "2026-09-10 22:09:12", "session_id": "68d3ace1", "level": "WARNING", "score": 60, "message": "Canh bao: score=60, NIHSS~0. ", "source": "fusion", "extra": {"risk": "WARNING", "nihss": 0}}
+{"timestamp": "2026-09-10 22:09:12", "session_id": "68d3ace1", "level": "EMERGENCY", "score": 85, "message": "NGUY CO DOT QUY CA! score=85, NIHSS~0. Quy tac: []", "source": "fusion", "extra": {"risk": "EMERGENCY", "nihss": 0}}
+{"timestamp": "2026-09-10 22:09:12", "session_id": "68d3ace1", "level": "EMERGENCY", "score": 95, "message": "score cao risk thấp", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 22:09:12", "session_id": "91c2d99e", "level": "WARNING", "score": 55, "message": "warn 1", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 22:09:12", "session_id": "91c2d99e", "level": "EMERGENCY", "score": 90, "message": "emergency ngay sau warning", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 22:10:12", "session_id": "302268aa", "level": "INFO", "score": 10, "message": "risk=NORMAL score=10 - khong bao dong", "source": "fusion", "extra": {}}
+{"timestamp": "2026-09-10 22:10:12", "session_id": "302268aa", "level": "INFO", "score": 40, "message": "risk=MONITOR score=40 - khong bao dong", "source": "fusion", "extra": {}}
+{"timestamp": "2026-09-10 22:10:12", "session_id": "302268aa", "level": "WARNING", "score": 60, "message": "Canh bao: score=60, NIHSS~0. ", "source": "fusion", "extra": {"risk": "WARNING", "nihss": 0}}
+{"timestamp": "2026-09-10 22:10:12", "session_id": "302268aa", "level": "EMERGENCY", "score": 85, "message": "NGUY CO DOT QUY CA! score=85, NIHSS~0. Quy tac: []", "source": "fusion", "extra": {"risk": "EMERGENCY", "nihss": 0}}
+{"timestamp": "2026-09-10 22:10:12", "session_id": "302268aa", "level": "EMERGENCY", "score": 95, "message": "score cao risk thấp", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 22:10:12", "session_id": "87e8658f", "level": "WARNING", "score": 55, "message": "warn 1", "source": "manual", "extra": {}}
+{"timestamp": "2026-09-10 22:10:12", "session_id": "87e8658f", "level": "EMERGENCY", "score": 90, "message": "emergency ngay sau warning", "source": "manual", "extra": {}}

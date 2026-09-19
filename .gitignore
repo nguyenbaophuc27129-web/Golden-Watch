@@ -8,6 +8,9 @@ venv/
 # Ứng dụng chạy tạo ra — không đưa vào git
 *.log
 
+# Model bên thứ ba dung lượng lớn (copy lại được từ fga_project/models)
+models/vosk-model-vn-0.4/
+
 # Hệ điều hành
 Thumbs.db
 .DS_Store

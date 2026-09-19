@@ -25,6 +25,7 @@ import os
 import sys
 import time
 import json
+import asyncio
 import threading
 from collections import deque
 
@@ -37,7 +38,11 @@ for p in (SRC_DIR, PROJECT_ROOT):
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from fastapi import FastAPI, Request
+# --lan: nghe trên MẠNG CỤC BỘ (hotspot/wifi nhà) để app điện thoại kết nối.
+# Mặc định KHÔNG có cờ = 127.0.0.1 (an toàn như cũ, điện thoại không thấy).
+HOST = '0.0.0.0' if '--lan' in sys.argv else '127.0.0.1'
+
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import (HTMLResponse, JSONResponse, Response,
                                StreamingResponse, FileResponse,
                                RedirectResponse)
@@ -54,16 +59,46 @@ from detection.radar_module import RadarModule
 MODELS = os.path.join(PROJECT_ROOT, 'models')
 JPEG_QUALITY = 70
 
+# ------------------------------------------------------------------
+# KIỂM TRA CỔNG TRƯỚC KHI LOAD MODEL (đỡ chờ 10s rồi mới báo lỗi)
+# ------------------------------------------------------------------
+import socket as _socket
+with _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM) as _s:
+    _s.settimeout(0.5)
+    if _s.connect_ex(('127.0.0.1', 5001)) == 0:
+        print('=' * 64)
+        print('  LỖI: Cổng 5001 ĐANG ĐƯỢC DÙNG — server cũ chưa tắt.')
+        print('  Cách tắt bản cũ (chọn 1):')
+        print('    1) Tìm cửa sổ server cũ nhấn Ctrl+C')
+        print('    2) Hoặc chạy lệnh:')
+        print('       netstat -ano | findstr :5001')
+        print('       taskkill /F /PID <số PID ở cột cuối>')
+        print('=' * 64)
+        sys.exit(1)
+
 # ======================================================================
 # LOAD MODEL 1 LẦN
 # ======================================================================
 print('[WEB] Đang tải model (chờ ~10 giây)...')
 from detection.face_module_v7 import FaceAsymmetryDetector      # noqa: E402
+from detection.face_ml_v3 import FaceMLV3                       # noqa: E402
 from detection.arm_module import ArmWeaknessDetector             # noqa: E402
 from detection.gait_module import GaitPoseDetector               # noqa: E402
 
 FACE = FaceAsymmetryDetector(
     model_path=os.path.join(MODELS, 'face_landmarker_v2.task'))
+FACE.ml_model = FaceMLV3.load_latest(MODELS)   # SYS-29: ML v3 28 đặc trưng
+print('[WEB] Face ML v3:',
+      (f'ON — artifact {FACE.ml_model.created}, '
+       f'AUC test {FACE.ml_model.auc_test}') if FACE.ml_model
+      else 'OFF (không có artifact face_blend_v3_*)')
+# NK-28: detector mặt RIÊNG cho HUD real-time (thread camera) — mặt xuất
+# hiện đâu trong khung góc rộng là khóa NGAY, không chờ chu kỳ phân tích
+# 2s. Instance riêng vì FaceLandmarker VIDEO mode không thread-safe;
+# ML v3 là toán thuần đọc artifact nên chia sẻ được.
+FACE_LIVE = FaceAsymmetryDetector(
+    model_path=os.path.join(MODELS, 'face_landmarker_v2.task'))
+FACE_LIVE.ml_model = FACE.ml_model
 ARM = ArmWeaknessDetector(
     pose_model_path=os.path.join(SRC_DIR, 'yolov8n-pose.pt'),
     ml_model_path=os.path.join(MODELS, 'arm_weakness_20260830_200657.pth'),
@@ -85,6 +120,8 @@ STATE = {
     'cam_annotated': None,      # frame đã vẽ YOLO+HUD (phục vụ MJPEG)
     'cam_error': None,
     'hud_face': None,           # kết quả face gần nhất (chu kỳ 2s)
+    'face_live': None,          # NK-28: face real-time từ thread camera
+    'arm_metrics': None,        # NK-28: metrics tay cho bảng HUD
     'modules': {},
     'fused_score': 0.0,
     'risk_level': '—',
@@ -99,6 +136,58 @@ STATE = {
 CAM_LOCK = threading.Lock()
 RADAR_LOCK = threading.Lock()
 ANALYSIS_LOCK = threading.Lock()
+
+# ------------------------------------------------------------------
+# MOBILE ALERT (NK-25): kênh sự kiện đẩy sang app điện thoại (PWA).
+# Thread phân tích push sự kiện (status mỗi chu kỳ 2s + alert khi có);
+# mỗi client WebSocket /ws đọc các sự kiện có seq lớn hơn lần đọc cuối.
+# Thuần ADD-ON: không đổi pipeline, không đổi điểm, không cần internet.
+# ------------------------------------------------------------------
+MOBILE_LOCK = threading.Lock()
+STATE['mobile_seq'] = 0
+STATE['mobile_events'] = deque(maxlen=100)
+
+
+def push_mobile_event(etype, **kw):
+    with MOBILE_LOCK:
+        STATE['mobile_seq'] += 1
+        ev = {'type': etype, 'seq': STATE['mobile_seq'],
+              't_server': time.strftime('%H:%M:%S'), **kw}
+        STATE['mobile_events'].append(ev)
+    return ev
+
+
+def build_mobile_snapshot():
+    with ANALYSIS_LOCK:
+        snap = {k: STATE.get(k) for k in ('modules', 'fused_score',
+                                          'risk_level', 'verdict', 'nihss',
+                                          'last_alert', 'camera_online',
+                                          'analysis_count', 'patient',
+                                          'radar_mode')}
+    with MOBILE_LOCK:
+        snap['seq'] = STATE['mobile_seq']
+    snap['type'] = 'snapshot'
+    snap['t_server'] = time.strftime('%H:%M:%S')
+    snap['host_lan'] = detect_lan_ip()
+    return snap
+
+
+def detect_lan_ip():
+    """IP LAN của laptop (để điện thoại mở http://<ip>:5001/mobile).
+    Kỹ thuật: UDP-connect KHÔNG gói tin nào gửi đi — chỉ tra bảng định tuyến."""
+    import socket
+    for probe in ('192.168.137.1', '8.8.8.8'):   # 137.1 = subnet hotspot Win
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.settimeout(0.2)
+            s.connect((probe, 80))
+            ip = s.getsockname()[0]
+            s.close()
+            if ip and not ip.startswith('127.'):
+                return ip
+        except Exception:
+            continue
+    return '127.0.0.1'
 
 FUSION = FusionEngine()
 DEFENSE = DefenseEngine()
@@ -122,53 +211,98 @@ FACE_NAMES = {'mouth_ratio': 'meo mieng', 'eye_ratio': 'lech nhan',
               'nasolabial_ratio': 'ranh mui-moi',
               'forehead_ratio': 'nep tran'}
 
+# NK-28: mạng landmark mặt theo ĐÚNG mẫu Google Face Landmarker
+# ([mediapipe_python_tasks]_face_landmarker.py): tesselation 2556 đoạn +
+# viền mặt/mắt/môi 124 đoạn + 2 vòng iris
+from mediapipe.tasks.python.vision import FaceLandmarksConnections as _FLC  # noqa: E402
+_FACE_TESS = np.array([(c.start, c.end)
+                       for c in _FLC.FACE_LANDMARKS_TESSELATION],
+                      dtype=np.int32)
+_FACE_CONT = np.array([(c.start, c.end)
+                       for c in _FLC.FACE_LANDMARKS_CONTOURS],
+                      dtype=np.int32)
+_FACE_IRIS = np.array([(c.start, c.end) for c in
+                       list(_FLC.FACE_LANDMARKS_LEFT_IRIS)
+                       + list(_FLC.FACE_LANDMARKS_RIGHT_IRIS)],
+                      dtype=np.int32)
+
+
+def draw_face_mesh(frame, lm, color):
+    """Vẽ mạng landmark QUANH MẶT (kiểu file mẫu Google): lưới mảnh phủ
+    mặt + viền đậm theo màu trạng thái + 2 iris vàng. 478 landmark tự
+    gắn vào mặt BẤT KỲ đâu trong khung — camera góc rộng vẫn bám được."""
+    h, w = frame.shape[:2]
+    pts = np.column_stack([lm[:, 0] * w, lm[:, 1] * h]).astype(np.int32)
+    for a, b in _FACE_TESS:
+        pa, pb = pts[a], pts[b]
+        cv2.line(frame, (pa[0], pa[1]), (pb[0], pb[1]),
+                 (140, 150, 140), 1)
+    for a, b in _FACE_CONT:
+        pa, pb = pts[a], pts[b]
+        cv2.line(frame, (pa[0], pa[1]), (pb[0], pb[1]),
+                 color, 2, cv2.LINE_AA)
+    for a, b in _FACE_IRIS:
+        pa, pb = pts[a], pts[b]
+        cv2.line(frame, (pa[0], pa[1]), (pb[0], pb[1]),
+                 (40, 230, 230), 1, cv2.LINE_AA)
+    return frame
+
 
 # ======================================================================
 # VẼ OVERLAY (khung xương YOLO + HUD méo mặt MediaPipe)
 # ======================================================================
-def draw_live_pose(frame, conf=0.30):
-    """Khung xương YOLO vẽ TỪNG KHUNG (tối đa 3 người — camera giám sát)."""
+def draw_live_pose(frame, conf=0.25):
+    """Khung xương YOLO vẽ TỪNG KHUNG (tối đa 3 người). Camera giám sát treo
+    cao → hạ conf + imgsz 480 để bắt được người NHỎ/XA ở góc trên khung."""
     if ARM.pose_model is None:
         return frame
     try:
         with YOLO_LOCK:
             res = ARM.pose_model.predict(frame, verbose=False, conf=conf,
-                                         imgsz=320)
+                                         imgsz=480)
         kpts = res[0].keypoints
         if kpts is None or kpts.xy is None or len(kpts.xy) == 0:
             return frame
         h, w = frame.shape[:2]
+        n_pts = 0
+        # NK-28: đoạn CÁNH TAY tô CYAN đậm (5-7-9 trái, 6-8-10 phải) —
+        # đúng vùng đo lệch nhẹ; phần xương còn lại xanh lá
+        ARM_BONES = {(5, 7), (7, 9), (6, 8), (8, 10)}
         for person in kpts.xy[:3]:
             pts = [(int(x * w), int(y * h))
                    for x, y in person.cpu().numpy()]
             for a, b in YOLO_SKELETON:
                 if a < len(pts) and b < len(pts):
-                    cv2.line(frame, pts[a], pts[b], (80, 220, 80), 2,
-                             cv2.LINE_AA)
-            for p in pts:
-                cv2.circle(frame, p, 3, (0, 255, 255), -1, cv2.LINE_AA)
+                    col = (230, 200, 60) if (a, b) in ARM_BONES \
+                        else (80, 220, 80)
+                    cv2.line(frame, pts[a], pts[b], col, 3, cv2.LINE_AA)
+            for i, p in enumerate(pts):
+                r = 5 if i in (5, 6, 7, 8, 9, 10) else 4
+                cv2.circle(frame, p, r, (0, 255, 255), -1, cv2.LINE_AA)
+                n_pts += 1
+        n_people = min(len(kpts.xy), 3)
+        cv2.putText(frame,
+                    f'NGUOI: {n_people}  DIEM CO THE: {n_pts}/{n_people * 17}',
+                    (w - 300, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (80, 220, 80), 1)
     except Exception:
         pass
     return frame
 
 
 def draw_face_hud(frame, face_r):
-    """HUD đo chính xác: oval hướng dẫn + điểm méo mặt + metric vượt ngưỡng."""
+    """HUD méo mặt kiểu GIÁM SÁT: landmark tự gắn vào mặt BẤT KỲ ở đâu
+    trong khung (không ép vị trí). Camera gác cao vẫn đo được."""
     h, w = frame.shape[:2]
-    cx, cy = w // 2, int(h * 0.46)
-    axes = (int(w * 0.22), int(h * 0.42))
     status = face_r.get('status', 'NO_FACE')
-    lost = status in ('NO_FACE', 'INVALID_LANDMARKS', 'NO_DETECTOR', 'ERROR')
+    lost = status in ('NO_FACE', 'INVALID_LANDMARKS', 'PARTIAL_FACE',
+                      'NO_DETECTOR', 'ERROR')
     color = {'DANGER': (0, 0, 255), 'WARNING': (0, 165, 255),
              'NORMAL': (60, 200, 60)}.get(status, (0, 0, 255))
-    cv2.ellipse(frame, (cx, cy), axes, 0, 0, 360,
-                (0, 0, 255) if lost else (210, 210, 210), 2, cv2.LINE_AA)
     lm = face_r.get('raw_landmarks')
     if lm is not None:
-        # chấm landmark MediaPipe (mỗi điểm thứ 2 — 239 chấm) quanh mặt
-        for x, y in lm[::2]:
-            cv2.circle(frame, (int(x * w), int(y * h)), 1,
-                       (230, 200, 150), -1, cv2.LINE_AA)
+        # NK-28: mạng landmark đầy đủ quanh mặt (thay 239 chấm rời)
+        frame = draw_face_mesh(frame, lm, color)
         xs, ys = lm[:, 0], lm[:, 1]
         cv2.rectangle(frame, (int(xs.min() * w), int(ys.min() * h)),
                       (int(xs.max() * w), int(ys.max() * h)), color, 2)
@@ -192,6 +326,21 @@ def draw_face_hud(frame, face_r):
                     (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     (0, 165, 255) if tilt > 10 else (255, 255, 255), 1)
         y += 22
+    yaw, pitch = rm.get('head_yaw'), rm.get('head_pitch')
+    if yaw is not None and pitch is not None and y <= 100:
+        cv2.putText(frame,
+                    f'chuyen dau (matrix MP): quay {yaw:.0f} | nga {pitch:.0f} do',
+                    (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (200, 200, 255), 1)
+        y += 22
+    ml = rm.get('ml_prob')
+    if ml is not None and y <= 100:
+        cv2.putText(frame,
+                    f'ML v3 (28 ft): {ml:.0f}%  |  rules: '
+                    f'{rm.get("score_rules", 0):.0f}',
+                    (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (120, 255, 120), 1)
+        y += 22
     for k, (t, unit) in FACE_THRESHOLDS.items():
         if k == 'face_tilt' or y > 100:
             continue
@@ -203,8 +352,34 @@ def draw_face_hud(frame, face_r):
                         (0, 165, 255), 1)
             y += 22
     if lost and not face_r.get('hold'):
-        cv2.putText(frame, 'MAT FACE — dat mat vao khung', (cx - 160, cy - 6),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.putText(frame, 'MAT: KHONG THAY MAT — landmark tu gan khi co mat',
+                    (10, h - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.45,
+                    (0, 0, 255), 1)
+    return frame
+
+
+def draw_arm_panel(frame):
+    """NK-28: bảng chi tiết TAY từ xương YOLO (góc vai-khuỷu-cổ tay,
+    độ rơi, lệch L/R) + CẢNH BÁO LỆCH NHẸ ngay khi lệch góc >10 độ hoặc
+    chênh cao cổ tay >30px — HIỂN THỊ THÊM, không đổi status/điểm."""
+    m = STATE.get('arm_metrics') or {}
+    if not m:
+        return frame
+    h, _w = frame.shape[:2]
+    y = h - 66
+    mild = bool(m.get('mild_asym'))
+    col = (0, 165, 255) if mild else (255, 255, 255)
+    cv2.putText(frame,
+                f"TAY L: goc {m.get('left_arm_angle', 0):.0f} do | "
+                f"R: {m.get('right_arm_angle', 0):.0f} do | "
+                f"lech goc {m.get('angle_asymmetry', 0):.0f} | "
+                f"lech cao {m.get('height_asymmetry', 0):.0f}px",
+                (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.45, col, 1)
+    if mild:
+        cv2.putText(frame,
+                    '! TAY LECH NHE — theo doi them (khong phai chuan doan)',
+                    (10, y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.45,
+                    (0, 165, 255), 1)
     return frame
 
 
@@ -218,6 +393,7 @@ def camera_worker():
     if not cap.isOpened():
         STATE['cam_error'] = 'Không mở được webcam'
         return
+    frame_idx = 0
     while True:
         ok, frame = cap.read()
         if not ok or frame is None:
@@ -230,11 +406,28 @@ def camera_worker():
         frame = cv2.flip(frame, 1)
         # vẽ khung xương YOLO từng khung (real-time)
         frame = draw_live_pose(frame)
-        # HUD mặt từ chu kỳ phân tích 2s
+        # NK-28: mặt REAL-TIME — detector riêng chạy mỗi khung chẵn:
+        # mặt hiện ở đâu là khóa ngay (<100ms), không chờ chu kỳ 2s
+        frame_idx += 1
+        if frame_idx % 2 == 0:
+            try:
+                STATE['face_live'] = FACE_LIVE.process_frame(frame)
+            except Exception:
+                pass
+        # HUD mặt: ưu tiên live có mặt; vắng thì dùng kết quả chu kỳ 2s
+        # (giữ HOLD 3s — mặt thoáng qua không nhấp nháy HUD)
+        live = STATE.get('face_live')
         with ANALYSIS_LOCK:
-            hud = STATE.get('hud_face')
+            cached = STATE.get('hud_face')
+        if live is not None and live.get('raw_landmarks') is not None:
+            hud = live
+        elif cached is not None and cached.get('raw_landmarks') is not None:
+            hud = cached
+        else:
+            hud = live if live is not None else cached
         if hud:
             frame = draw_face_hud(frame, hud)
+        draw_arm_panel(frame)
         with CAM_LOCK:
             STATE['cam_frame'] = frame.copy()
         time.sleep(0.03)
@@ -310,6 +503,7 @@ def run_analysis_cycle(frame):
     fused['trend'] = verdict['trend']
 
     # ----- ALERT -----
+    alert_pushed = False
     if verdict['alert']:
         fused_alert = dict(fused)
         fused_alert['recommendation'] = \
@@ -323,6 +517,25 @@ def run_analysis_cycle(frame):
                 'time': ts}
             HANDOFF.add_event('ALERT', f'Fusion {fused["fused_score"]}',
                               {'risk': fused['risk_level']})
+            # NK-25: đẩy báo động sang app điện thoại (còi + rung + thẻ đỏ)
+            push_mobile_event('alert', level=fused['risk_level'],
+                              score=fused['fused_score'],
+                              message='CAN BAO DOT QUY — kiem tra nguoi than!',
+                              time=ts,
+                              nihss_total=(nih.get('total')
+                                           if isinstance(nih, dict) else None))
+            alert_pushed = True
+
+    # ----- NIHSS + Handoff events -----
+    nih = estimate_nihss(filtered)
+    nih.update(calculate_nihss_ci(filtered, n_iter=300))
+    HANDOFF.add_event('CYCLE', f'score={fused["fused_score"]} '
+                               f'risk={fused["risk_level"]}')
+    if alert_pushed:
+        # NIHSS tính xong sau alert — cập nhật thêm NIHSS vào event báo động
+        push_mobile_event('alert_nihss', level=fused['risk_level'],
+                          nihss_total=nih.get('total'),
+                          nihss_margin=nih.get('margin'))
 
     # ----- NIHSS + Handoff events -----
     nih = estimate_nihss(filtered)
@@ -344,6 +557,7 @@ def run_analysis_cycle(frame):
 
     with ANALYSIS_LOCK:
         STATE['hud_face'] = dict(face_r)
+        STATE['arm_metrics'] = arm_r.get('metrics') or {}
         STATE['modules'] = {
             'face': {'status': face_r.get('status', '?'),
                      'score': round(float(face_r.get('score', 0) or 0), 1)},
@@ -361,6 +575,13 @@ def run_analysis_cycle(frame):
         STATE['verdict'] = verdict
         STATE['nihss'] = nih
         STATE['analysis_count'] += 1
+    # NK-25: nhịp tim cho app điện thoại (heartbeat 2s — app mất nhịp
+    # >15s = mất kết nối với máy chủ → tự báo trên điện thoại)
+    push_mobile_event('status', risk_level=fused['risk_level'],
+                      fused_score=round(float(fused['fused_score']), 1),
+                      camera_online=STATE['camera_online'],
+                      analysis_count=STATE['analysis_count'],
+                      radar_mode=STATE['radar_mode'])
 
 
 # ======================================================================
@@ -448,6 +669,110 @@ async def patient_post(req: Request):
 async def alert_test():
     ALERTER.send_alert(95, 'Test he thong bao dong (web)',
                        level='EMERGENCY', source='web-test')
+    push_mobile_event('alert', level='EMERGENCY', score=95,
+                      message='Test he thong bao dong (web)',
+                      time=time.strftime('%H:%M:%S'))
+    return {'ok': True}
+
+
+# ======================================================================
+# MOBILE ALERT (NK-25) — app điện thoại PWA qua LAN/hotspot, KHÔNG internet
+# ======================================================================
+@app.websocket('/ws')
+async def ws_events(ws: WebSocket):
+    """Kênh sự kiện thời gian thực: snapshot đầu tiên → các sự kiện mới
+    (status mỗi 2s · alert khi báo động). Client ngắt → thoát sạch."""
+    await ws.accept()
+    last = 0
+    try:
+        await ws.send_json(build_mobile_snapshot())
+        while True:
+            with MOBILE_LOCK:
+                pending = [e for e in STATE['mobile_events']
+                           if e['seq'] > last]
+            for ev in pending:
+                await ws.send_json(ev)
+                last = ev['seq']
+            try:
+                await asyncio.wait_for(ws.receive_text(), timeout=0.5)
+            except asyncio.TimeoutError:
+                continue
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        try:
+            await ws.close()
+        except Exception:
+            pass
+
+
+@app.get('/mobile', response_class=HTMLResponse)
+def mobile_page():
+    return MOBILE_HTML
+
+
+@app.get('/mobile_manifest.json')
+def mobile_manifest():
+    return JSONResponse({
+        'name': 'Golden-Watch Cảnh báo',
+        'short_name': 'Golden-Watch',
+        'start_url': '/mobile',
+        'display': 'standalone',
+        'background_color': '#0d1117',
+        'theme_color': '#c81e1e',
+        'icons': [{'src': '/mobile/icon-192.png', 'sizes': '192x192',
+                   'type': 'image/png'},
+                  {'src': '/mobile/icon-512.png', 'sizes': '512x512',
+                   'type': 'image/png'}]})
+
+
+def _mobile_icon(size):
+    """Icon đồng hồ trắng trên nền đỏ đậm — sinh 1 lần, cache ra exports/."""
+    path = os.path.join(PROJECT_ROOT, 'exports', f'mobile_icon_{size}.png')
+    if not os.path.exists(path):
+        img = np.full((size, size, 3), (30, 30, 200), dtype=np.uint8)
+        img[:, :size // 8] = (20, 20, 160)
+        c, r = size // 2, int(size * 0.36)
+        cv2.circle(img, (c, c), r, (255, 255, 255), max(2, size // 24),
+                   cv2.LINE_AA)
+        cv2.circle(img, (c, c), max(3, size // 40), (255, 255, 255), -1,
+                   cv2.LINE_AA)
+        cv2.line(img, (c, c), (c, c - int(r * 0.62)), (255, 255, 255),
+                 max(2, size // 28), cv2.LINE_AA)
+        cv2.line(img, (c, c), (c + int(r * 0.45), c + int(r * 0.25)),
+                 (255, 255, 255), max(2, size // 28), cv2.LINE_AA)
+        cv2.imwrite(path, img)
+    return path
+
+
+@app.get('/mobile/icon-192.png')
+def mobile_icon_192():
+    return FileResponse(_mobile_icon(192), media_type='image/png')
+
+
+@app.get('/mobile/icon-512.png')
+def mobile_icon_512():
+    return FileResponse(_mobile_icon(512), media_type='image/png')
+
+
+@app.get('/mobile/qr')
+def mobile_qr():
+    """QR mở app trên điện thoại (dùng IP LAN thật — hotspot hoặc wifi nhà)."""
+    import qrcode
+    import io
+    url = f'http://{detect_lan_ip()}:5001/mobile'
+    img = qrcode.make(url)
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    return Response(buf.getvalue(), media_type='image/png')
+
+
+@app.post('/mobile/ack')
+async def mobile_ack():
+    """Điện thoại bấm 'TÔI ỔN' — ghi vào log bàn giao để đối chiếu."""
+    HANDOFF.add_event('MOBILE_ACK', 'Người thân xác nhận trên app điện thoại',
+                      {'time': time.strftime('%H:%M:%S')})
+    print('[MOBILE] Người thân đã xác nhận "TÔI ỔN" trên app')
     return {'ok': True}
 
 
@@ -577,6 +902,23 @@ PAGE_HTML = """<!DOCTYPE html>
       </div>
     </div>
     <div class="card" style="margin-top:14px">
+      <b>📱 App cảnh báo trên điện thoại</b>
+      <div class="row" style="margin-top:8px;align-items:center">
+        <img src="/mobile/qr" alt="QR app điện thoại"
+             style="width:130px;height:130px;background:#fff;
+                    border-radius:8px;padding:4px">
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:13px;line-height:1.6">
+            1. Chạy server với cờ <code>--lan</code> (hotspot laptop hoặc
+            wifi nhà — KHÔNG cần internet)<br>
+            2. Điện thoại quét QR này (hoặc mở
+            <code>http://&lt;IP-laptop&gt;:5001/mobile</code>)<br>
+            3. Chrome → ⋮ → <b>Thêm vào Màn hình chính</b> = cài app
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
       <b>👤 Thông tin người bệnh</b>
       <form action="/patient" method="post" style="margin-top:8px">
         <div class="row"><div style="flex:2"><label>Họ tên</label>
@@ -675,21 +1017,224 @@ setInterval(tick, 1000); tick();
 
 
 # ======================================================================
+# TRANG APP ĐIỆN THOẠI (PWA — mở /mobile → 'Thêm vào Màn hình chính')
+# ======================================================================
+MOBILE_HTML = """<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,
+  user-scalable=no">
+<link rel="manifest" href="/mobile_manifest.json">
+<meta name="theme-color" content="#c81e1e">
+<title>Golden-Watch — Cảnh báo</title>
+<style>
+  :root{--bg:#0d1117;--card:#161b22;--line:#30363d;--tx:#e6edf3;
+    --mut:#8b949e;--grn:#2ea043;--ylw:#d29922;--red:#e5484d}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--tx);
+    font-family:'Segoe UI',Arial,sans-serif}
+  #conn{position:fixed;top:0;left:0;right:0;padding:8px 14px;font-size:13px;
+    font-weight:700;text-align:center;z-index:5}
+  .on{background:#123d1f;color:#7ee2a0}.off{background:#5c1015;color:#ffb4b6}
+  main{padding:56px 14px 20px;max-width:520px;margin:0 auto}
+  .pill{display:inline-block;padding:6px 16px;border-radius:20px;
+    font-weight:800;color:#fff;background:#444}
+  .big{font-size:64px;font-weight:800;line-height:1;margin:10px 0}
+  .card{background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:14px;margin-top:12px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .mod{border:1px solid var(--line);border-radius:10px;padding:8px;
+    font-size:13px;display:flex;justify-content:space-between}
+  .g{color:var(--grn);font-weight:800}.y{color:var(--ylw);font-weight:800}
+  .r{color:var(--red);font-weight:800}
+  button{border:0;border-radius:12px;padding:16px;font-size:17px;
+    font-weight:800;width:100%;margin-top:10px;color:#fff;cursor:pointer}
+  .b-ack{background:#1a7a3a}.b-115{background:#c81e1e}
+  .b-cam{background:#1f6feb}.b-perm{background:#444;padding:10px;
+    font-size:14px}
+  #overlay{position:fixed;inset:0;background:rgba(160,10,10,.97);z-index:9;
+    display:none;overflow:auto;padding:24px 18px;text-align:center}
+  #ovl-ylw{position:fixed;inset:0;background:rgba(120,80,0,.97);z-index:8;
+    display:none;overflow:auto;padding:24px 18px;text-align:center}
+  #overlay h1,#ovl-ylw h1{font-size:26px;margin:6px 0}
+  #overlay .s,#ovl-ylw .s{font-size:16px;color:#ffe;min-height:22px}
+  .tip{color:var(--mut);font-size:12px;margin-top:14px;line-height:1.6}
+  #hist{font-size:13px;line-height:1.7;min-height:20px}
+</style></head><body>
+<div id="conn" class="off">⏳ ĐANG KẾT NỐI VỚI MÁY CHỦ…</div>
+<main>
+  <div style="text-align:center">
+    <span class="pill" id="risk">—</span>
+    <div class="big"><span id="score">—</span><span style="font-size:22px;
+      color:var(--mut)">/100</span></div>
+    <div style="color:var(--mut)" id="pt">Chưa nhập người bệnh</div>
+  </div>
+  <div class="card"><b>📷 5 module — trạng thái</b>
+    <div class="grid" id="mods"></div>
+    <div style="margin-top:8px;color:var(--mut);font-size:13px">
+      NIHSS ước tính: <b id="nihss">—</b> · Chu kỳ: <b id="cyc">0</b> ·
+      Radar: <span id="radarmode">—</span></div>
+  </div>
+  <div class="card"><b>🔔 Lịch cảnh báo</b><div id="hist" style="margin-top:6px">
+    <span style="color:var(--mut)">Chưa có</span></div>
+    <button class="b-perm" onclick="askPerm()">🔓 Bật thông báo màn hình khóa
+      (cho phép 1 lần)</button>
+  </div>
+  <div class="tip">📲 Cài như app: Chrome → nút ⋮ → <b>Thêm vào Màn hình
+    chính</b>. Hoạt động qua hotspot laptop — KHÔNG cần internet.<br>
+    ⚠️ KHÔNG PHẢN CHẨN ĐOÁN — khẩn cấp GỌI 115.</div>
+</main>
+<div id="ovl-ylw">
+  <h1>⚠️ NGUY CƠ TRUNG BÌNH</h1><div class="s" id="ylw-s"></div>
+  <button class="b-ack" onclick="ack()">✓ TÔI ĐÃ BIẾT — TẮT CẢNH BÁO</button>
+</div>
+<div id="overlay">
+  <h1>🚨 CẢNH BÁO ĐỘT QUỴ</h1>
+  <div class="s" id="ovl-s"></div>
+  <div style="font-size:20px;margin-top:8px" id="ovl-nihss"></div>
+  <button class="b-115" onclick="location.href='tel:115'">📞 GỌI 115 NGAY</button>
+  <button class="b-ack" onclick="ack()">✓ TÔI ỔN — TẮT CÒI</button>
+  <button class="b-cam" onclick="window.open('/video.mjpg')">📷 XEM CAMERA</button>
+</div>
+<script>
+let ws=null,seq=0,lastEv=Date.now(),siren=null,vibT=null,alarmLv=null;
+const $=id=>document.getElementById(id);
+function esc(s){return (s??'').toString().replace(/[<>&]/g,
+  c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}
+function beep(f,d,t0){const o=ac.createOscillator(),g=ac.createGain();
+  o.frequency.value=f;o.type='square';g.gain.value=.12;
+  o.connect(g);g.connect(ac.destination);
+  o.start(t0);o.stop(t0+d/1000)}
+let ac=null;
+function sirenStart(){if(siren)return;ac=ac||new (window.AudioContext||
+  window.webkitAudioContext)();const loop=()=>{const t=ac.currentTime;
+  beep(660,300,t);beep(880,300,t+.3);beep(660,300,t+.6);beep(880,300,t+.9)};
+  loop();siren=setInterval(loop,1300);
+  vibT=setInterval(()=>navigator.vibrate&&navigator.vibrate([400,200,400,200,
+    400,800]),2400)}
+function silence(){if(siren){clearInterval(siren);siren=null}
+  if(vibT){clearInterval(vibT);vibT=null}
+  navigator.vibrate&&navigator.vibrate(0)}
+function notify(title,body){if(Notification&&Notification.permission===
+  'granted'){try{navigator.serviceWorker&&0;
+    new Notification(title,{body:body,tag:'gw-alert'})}catch(e){}}}
+function askPerm(){if(window.Notification){Notification.requestPermission()
+  .then(p=>alert(p==='granted'?'Đã bật — báo động sẽ hiện cả khi tắt màn hình'
+  :'Chưa được phép — vẫn có còi + rung khi app mở'))}}
+function showAlert(ev){
+  if(ev.level==='EMERGENCY'){
+    $('ovl-s').textContent=(ev.message||'')+' — điểm '+ev.score+'/100 · '
+      +ev.time;
+    $('ovl-nihss').textContent='NIHSS ước tính: '
+      +(ev.nihss_total??'…')+' / 13';
+    $('overlay').style.display='block';$('ovl-ylw').style.display='none';
+    sirenStart();
+    notify('🚨 CẢNH BÁO ĐỘT QUỴ','Điểm '+ev.score+'/100 — kiểm tra người thân!')
+  } else {
+    $('ylw-s').textContent='Điểm '+ev.score+'/100 lúc '+ev.time
+      +' — nên đến gặp người thân kiểm tra.';
+    $('ovl-ylw').style.display='block';$('overlay').style.display='none';
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    beep(520,500,ac.currentTime);
+    notify('⚠️ Golden-Watch: nguy cơ trung bình','Điểm '+ev.score+'/100');
+    setTimeout(()=>{$('ovl-ylw').style.display='none'},30000)
+  }
+  addHist(ev)}
+function addHist(ev){const h=$('hist');
+  if(h.textContent.indexOf('Chưa có')>=0)h.textContent='';
+  h.innerHTML='⚠️ ['+esc(ev.level)+'] '+esc(ev.time)+' — điểm '
+    +esc(ev.score)+'<br>'+h.innerHTML}
+function ack(){silence();$('overlay').style.display='none';
+  $('ovl-ylw').style.display='none';
+  fetch('/mobile/ack',{method:'POST'})}
+function paint(st){ // vẽ trạng thái thường
+  $('score').textContent=st.fused_score??'—';
+  const r=$('risk');r.textContent=st.risk_level||'—';
+  r.style.background={NORMAL:'#1a7a3a',MONITOR:'#b8860b',WARNING:'#d97706',
+    EMERGENCY:'#c81e1e'}[st.risk_level]||'#555';
+  const p=st.patient||{};
+  $('pt').textContent=p.name?('Người giám sát: '+p.name
+    +(p.age?(' · '+p.age+' tuổi'):'')):'Chưa nhập người bệnh';
+  const nm={face:'Méo mặt',arm:'Tay yếu',gait:'Dáng đi',radar:'Radar'};
+  const cl=s=>s==='NORMAL'?'g':(s==='WARNING'||s==='MONITOR')?'y':'r';
+  let h='';for(const k in st.modules||{}){const m=st.modules[k];
+    h+='<div class="mod"><span>'+esc(nm[k]||k)+'</span><span class="'
+    +cl(m.status)+'">'+esc(m.status)+' '+m.score+'</span></div>'}
+  $('mods').innerHTML=h||'<i style="color:var(--mut)">Chờ chu kỳ phân tích…</i>';
+  if(st.nihss)$('nihss').textContent=(st.nihss.total??'—')+' ± '
+    +(st.nihss.margin??'?')+' / 13';
+  $('cyc').textContent=st.analysis_count??0;
+  $('radarmode').textContent=st.radar_mode||'—'}
+function connect(){
+  const proto=location.protocol==='https:'?'wss':'ws';
+  ws=new WebSocket(proto+'://'+location.host+'/ws');
+  ws.onopen=()=>{$('conn').className='on';
+    $('conn').textContent='🟢 ĐANG KẾT NỐI VỚI MÁY CHỦ — '+location.host};
+  ws.onmessage=m=>{lastEv=Date.now();let ev;
+    try{ev=JSON.parse(m.data)}catch(e){return}
+    if(ev.type==='snapshot'){paint(ev);
+      if(ev.last_alert)addHist(ev.last_alert);return}
+    if(ev.type==='status'){paint(ev);return}
+    if(ev.type==='alert'||ev.type==='alert_nihss'){
+      if(ev.type==='alert_nihss'&&$('overlay').style.display==='block'){
+        $('ovl-nihss').textContent='NIHSS ước tính: '
+          +(ev.nihss_total??'…')+' ± '+(ev.nihss_margin??'?')+' / 13';return}
+      showAlert(ev)}};
+  ws.onclose=()=>{$('conn').className='off';
+    $('conn').textContent='🔴 MẤT KẾT NỐI VỚI MÁY CHỦ — kiểm tra laptop!';
+    silence();setTimeout(connect,2000)};
+  ws.onerror=()=>ws.close()}
+// watchdog: quá 15s không có nhịp tim nào → coi như mất kết nối
+setInterval(()=>{if(Date.now()-lastEv>15000&&$('conn').className==='on'){
+  $('conn').className='off';
+  $('conn').textContent='🔴 MẤT NHỊP TÍN HIỆU (>15s) — kiểm tra laptop!';
+  silence()}},3000);
+connect();
+</script></body></html>"""
+
+
+# ======================================================================
 # MAIN
 # ======================================================================
+def _port_busy(port=5001):
+    """Kiểm tra cổng đã có process nào nghe chưa (tránh lỗi bind ầm ĩ)."""
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.5)
+        return s.connect_ex(('127.0.0.1', port)) == 0
+
+
 def main():
+    if _port_busy(5001):
+        print('=' * 64)
+        print('  LỖI: Cổng 5001 ĐANG ĐƯỢC DÙNG — có thể server cũ chưa tắt.')
+        print('  Cách tắt bản cũ (chọn 1):')
+        print('    1) Tìm cửa sổ server cũ nhấn Ctrl+C')
+        print('    2) Hoặc chạy lệnh:')
+        print('       netstat -ano | findstr :5001')
+        print('       taskkill /F /PID <số PID ở cột cuối>')
+        print('=' * 64)
+        sys.exit(1)
+
     threading.Thread(target=camera_worker, daemon=True).start()
     threading.Thread(target=radar_worker, daemon=True).start()
     threading.Thread(target=analysis_worker, daemon=True).start()
 
     import uvicorn
+    lan_ip = detect_lan_ip()
     print('=' * 64)
     print('  GOLDEN-WATCH WEB — mở trình duyệt:  http://localhost:5001')
     print('  Video MJPEG (mở VLC được): http://localhost:5001/video.mjpg')
-    print('  Chỉ nghe trên 127.0.0.1 (localhost) — KHÔNG mở ra mạng ngoài')
+    if HOST == '0.0.0.0':
+        print('  CHẾ ĐỘ --lan: app điện thoại mở  '
+              f'http://{lan_ip}:5001/mobile')
+        print('  (Dashboard cũng có QR ở thẻ "App điện thoại")')
+        print('  ⚠️ Server nghe trên MẠNG CỤC BỘ — chỉ dùng hotspot/wifi nhà')
+    else:
+        print('  Chỉ nghe trên 127.0.0.1 — KHÔNG mở ra mạng ngoài.')
+        print('  Bật app điện thoại: chạy lại với cờ  --lan')
     print('  Ctrl+C để dừng · KHÔNG PHẢN CHẨN ĐOÁN — khẩn cấp GỌI 115')
     print('=' * 64)
-    uvicorn.run(app, host='127.0.0.1', port=5001, log_level='warning')
+    uvicorn.run(app, host=HOST, port=5001, log_level='warning')
 
 
 if __name__ == '__main__':

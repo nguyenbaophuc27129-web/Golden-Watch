@@ -323,6 +323,12 @@ class ArmWeaknessDetector:
 
         metrics['height_asymmetry'] = abs(left_height - right_height)
 
+        # NK-28: cờ LỆCH NHẸ chỉ để HIỂN THỊ cảnh báo sớm trên HUD —
+        # không tham gia tính điểm/status của fusion (model giữ nguyên)
+        metrics['mild_asym'] = bool(
+            metrics.get('angle_asymmetry', 0) > 10
+            or metrics.get('height_asymmetry', 0) > 30)
+
         # Weak arm detection
         metrics['weak_arm'] = self._identify_weak_arm(metrics)
 

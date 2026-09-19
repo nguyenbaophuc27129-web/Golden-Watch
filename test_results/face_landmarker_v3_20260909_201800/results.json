@@ -1,0 +1,84 @@
+{
+ "seed": 42,
+ "dataset": "C:\\Users\\Admin\\Documents\\NCKHKT_26\\fga_project\\data\\datasets\\face\\Annotated stroke and non stroke Dataset",
+ "conf_min": 0.3,
+ "max_yaw": 60.0,
+ "results": [
+  {
+   "group": "G4_all",
+   "n_features": 28,
+   "C": 0.1,
+   "auc_oof_train": 0.9421,
+   "threshold": 0.298,
+   "auc_test": 0.943,
+   "sens_test": 0.8007,
+   "spec_test": 0.9409,
+   "f1_test": 0.8459,
+   "cm": {
+    "tp": 225,
+    "fp": 26,
+    "tn": 414,
+    "fn": 56
+   },
+   "n_train": 2994,
+   "n_test": 721
+  },
+  {
+   "group": "G1_5ratios",
+   "n_features": 5,
+   "C": 0.1,
+   "auc_oof_train": 0.9295,
+   "threshold": 0.3701,
+   "auc_test": 0.9237,
+   "sens_test": 0.7774,
+   "spec_test": 0.9178,
+   "f1_test": 0.8211,
+   "cm": {
+    "tp": 234,
+    "fp": 35,
+    "tn": 391,
+    "fn": 67
+   },
+   "n_train": 2988,
+   "n_test": 727
+  },
+  {
+   "group": "G3_blend_asym_pose",
+   "n_features": 23,
+   "C": 0.03,
+   "auc_oof_train": 0.7315,
+   "threshold": 0.3648,
+   "auc_test": 0.7634,
+   "sens_test": 0.5853,
+   "spec_test": 0.8004,
+   "f1_test": 0.598,
+   "cm": {
+    "tp": 151,
+    "fp": 96,
+    "tn": 385,
+    "fn": 107
+   },
+   "n_train": 2976,
+   "n_test": 739
+  },
+  {
+   "group": "G2_blend_asym",
+   "n_features": 20,
+   "C": 0.1,
+   "auc_oof_train": 0.7231,
+   "threshold": 0.357,
+   "auc_test": 0.7039,
+   "sens_test": 0.5466,
+   "spec_test": 0.7958,
+   "f1_test": 0.5986,
+   "cm": {
+    "tp": 170,
+    "fp": 87,
+    "tn": 339,
+    "fn": 141
+   },
+   "n_train": 2978,
+   "n_test": 737
+  }
+ ]
+}

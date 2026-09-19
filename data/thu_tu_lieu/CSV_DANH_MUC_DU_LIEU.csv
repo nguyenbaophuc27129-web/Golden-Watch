@@ -1,0 +1,10 @@
+loai,ten_file,ma_nguoi,tinh_huong,thoi_luong_s,ngay_thu,ghi_chu
+face,P01_bt_f01.jpg,P01,binh_thuong,,18/09/2026,
+face,P01_cuoi_f01.jpg,P01,cuoi,,18/09/2026,
+face,P01_meo_giaLap_f01.jpg,P01,meo_mieng_giaLap,,18/09/2026,
+arm,P01_gio_tay_01.mp4,P01,gio_2_tay_10s,,18/09/2026,
+gait,P01_di_bo_01.mp4,P01,di_thang_3m,,18/09/2026,
+speech,P01_doc_cau1.wav,P01,doc_cau_binh_thuong,,18/09/2026,
+speech,P01_doc_cau2_nguoc.wav,P01,doc_nguoc_vi,,18/09/2026,
+radar,P01_radar_diLai_01.csv,P01,di_lai_phong,,18/09/2026,
+video_nihss,V01_nihss_full.mp4,V01,tong_hop_4module,,19/09/2026,cham_2_rater

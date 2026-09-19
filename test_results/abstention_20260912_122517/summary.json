@@ -1,0 +1,162 @@
+{
+ "protocol": {
+  "seed": 42,
+  "face": "OOF GroupKFold-5 theo block × 10 seed [42, 43, 44, 45, 46, 47, 48, 49, 50, 51], prob hệ = mean, uncertainty = std ensemble; C tune inner GroupKFold (khác NK-04 80/20 vì cần OOF per-image)",
+  "speech": "tái dùng OOF CSV NK-03 (LOSO người thật seed 42); prob hệ = mean(p_logreg,p_mlp), uncertainty = std",
+  "threshold": "Youden trên OOF pooled từng module",
+  "uncertainty_runtime": "combined = 0.5·std/0.5 + 0.5·(1 − margin/0.5)",
+  "abstain_rule": "top-frac bất định nhất → NEEDS_CHECK (không hạ EMERGENCY)"
+ },
+ "modules": {
+  "face": {
+   "auc_ensemble_mean": 0.9413,
+   "auc_platt_cv": 0.9393,
+   "auc_single_seed_range": [
+    0.9409,
+    0.9409
+   ],
+   "threshold_youden": 0.308,
+   "selective": {
+    "threshold": 0.308,
+    "base": {
+     "coverage": 1.0,
+     "n": 3715,
+     "sens": 84.0,
+     "spec": 90.5,
+     "fpr": 9.5,
+     "err_rate": 11.66
+    },
+    "steps": {
+     "abstain_10": {
+      "kept": {
+       "coverage": 0.8999,
+       "n": 3343,
+       "sens": 87.0,
+       "spec": 93.2,
+       "fpr": 6.8,
+       "err_rate": 8.88
+      },
+      "err_rate_among_abstained": 36.56,
+      "err_reduction_kept": 2.78
+     },
+     "abstain_20": {
+      "kept": {
+       "coverage": 0.8,
+       "n": 2972,
+       "sens": 91.1,
+       "spec": 94.7,
+       "fpr": 5.3,
+       "err_rate": 6.56
+      },
+      "err_rate_among_abstained": 32.03,
+      "err_reduction_kept": 5.1
+     },
+     "abstain_30": {
+      "kept": {
+       "coverage": 0.7001,
+       "n": 2601,
+       "sens": 94.6,
+       "spec": 95.0,
+       "fpr": 5.0,
+       "err_rate": 5.15
+      },
+      "err_rate_among_abstained": 26.84,
+      "err_reduction_kept": 6.51
+     }
+    },
+    "unc_error_auc": 0.777,
+    "n": 3715
+   }
+  },
+  "speech": {
+   "auc_logreg": 0.6202,
+   "auc_mlp": 0.6093,
+   "auc_ensemble_mean": 0.6219,
+   "auc_platt_cv": 0.4302,
+   "threshold_youden": 0.755,
+   "selective": {
+    "threshold": 0.755,
+    "base": {
+     "coverage": 1.0,
+     "n": 1100,
+     "sens": 48.1,
+     "spec": 79.1,
+     "fpr": 20.9,
+     "err_rate": 36.09
+    },
+    "steps": {
+     "abstain_10": {
+      "kept": {
+       "coverage": 0.9,
+       "n": 990,
+       "sens": 48.5,
+       "spec": 79.3,
+       "fpr": 20.7,
+       "err_rate": 36.26
+      },
+      "err_rate_among_abstained": 34.55,
+      "err_reduction_kept": -0.17
+     },
+     "abstain_20": {
+      "kept": {
+       "coverage": 0.8,
+       "n": 880,
+       "sens": 48.8,
+       "spec": 81.2,
+       "fpr": 18.8,
+       "err_rate": 35.34
+      },
+      "err_rate_among_abstained": 39.09,
+      "err_reduction_kept": 0.75
+     },
+     "abstain_30": {
+      "kept": {
+       "coverage": 0.7,
+       "n": 770,
+       "sens": 47.4,
+       "spec": 85.5,
+       "fpr": 14.5,
+       "err_rate": 33.51
+      },
+      "err_rate_among_abstained": 42.12,
+      "err_reduction_kept": 2.58
+     }
+    },
+    "unc_error_auc": 0.488,
+    "n": 1100
+   }
+  }
+ },
+ "headline": {
+  "face": {
+   "unc_error_auc": 0.777,
+   "abstain_20": {
+    "kept": {
+     "coverage": 0.8,
+     "n": 2972,
+     "sens": 91.1,
+     "spec": 94.7,
+     "fpr": 5.3,
+     "err_rate": 6.56
+    },
+    "err_rate_among_abstained": 32.03,
+    "err_reduction_kept": 5.1
+   }
+  },
+  "speech": {
+   "unc_error_auc": 0.488,
+   "abstain_20": {
+    "kept": {
+     "coverage": 0.8,
+     "n": 880,
+     "sens": 48.8,
+     "spec": 81.2,
+     "fpr": 18.8,
+     "err_rate": 35.34
+    },
+    "err_rate_among_abstained": 39.09,
+    "err_reduction_kept": 0.75
+   }
+  }
+ }
+}

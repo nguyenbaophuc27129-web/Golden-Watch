@@ -72,6 +72,11 @@ def load_detectors():
 
     face = FaceAsymmetryDetector(
         model_path=os.path.join(MODELS, 'face_landmarker_v2.task'))
+    from detection.face_ml_v3 import FaceMLV3
+    face.ml_model = FaceMLV3.load_latest(MODELS)   # SYS-29: ML v3
+    print('[APP] Face ML v3:',
+          f'ON — artifact {face.ml_model.created}' if face.ml_model
+          else 'OFF (không có artifact face_blend_v3_*)')
     arm = ArmWeaknessDetector(
         pose_model_path=os.path.join(SRC_DIR, 'yolov8n-pose.pt'),
         ml_model_path=os.path.join(
@@ -164,28 +169,36 @@ def stop_workers():
     ss.prev_gray = None
 
 
-def draw_live_pose(frame, pose_model, lock, conf=0.30):
+def draw_live_pose(frame, pose_model, lock, conf=0.25):
     """Vẽ khung xương YOLO TRỰC TIẾP mỗi khung video (tối đa 3 người).
-    Chỉ VIZ — không ảnh hưởng phân tích (phân tích chạy chu kỳ riêng)."""
+    Chỉ VIZ — không ảnh hưởng phân tích (phân tích chạy chu kỳ riêng).
+    Camera treo cao → hạ conf + imgsz 480 để bắt được người NHỎ/XA."""
     if pose_model is None:
         return frame
     try:
         with lock:
             res = pose_model.predict(frame, verbose=False, conf=conf,
-                                     imgsz=320)
+                                     imgsz=480)
         kpts = res[0].keypoints
         if kpts is None or kpts.xy is None or len(kpts.xy) == 0:
             return frame
         h, w = frame.shape[:2]
+        n_pts = 0
         for person in kpts.xy[:3]:
             pts = [(int(x * w), int(y * h))
                    for x, y in person.cpu().numpy()]
             for a, b in YOLO_SKELETON:
                 if a < len(pts) and b < len(pts):
-                    cv2.line(frame, pts[a], pts[b], (80, 220, 80), 2,
+                    cv2.line(frame, pts[a], pts[b], (80, 220, 80), 3,
                              cv2.LINE_AA)
             for p in pts:
-                cv2.circle(frame, p, 3, (0, 255, 255), -1, cv2.LINE_AA)
+                cv2.circle(frame, p, 4, (0, 255, 255), -1, cv2.LINE_AA)
+                n_pts += 1
+        n_people = min(len(kpts.xy), 3)
+        cv2.putText(frame,
+                    f'NGUOI: {n_people}  DIEM CO THE: {n_pts}/{n_people * 17}',
+                    (w - 300, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (80, 220, 80), 1)
     except Exception:
         pass
     return frame
@@ -233,27 +246,55 @@ FACE_NAMES = {'mouth_ratio': 'meo mieng', 'eye_ratio': 'lech nhan',
               'face_tilt': 'nghieng dau', 'nasolabial_ratio': 'ranh mui-moi',
               'forehead_ratio': 'nep tran'}
 
+# NK-28: mạng landmark mặt theo mẫu Google Face Landmarker (đồng bộ
+# web_server): tesselation + viền mặt/mắt/môi + 2 iris
+from mediapipe.tasks.python.vision import FaceLandmarksConnections as _FLC  # noqa: E402
+_FACE_TESS = np.array([(c.start, c.end)
+                       for c in _FLC.FACE_LANDMARKS_TESSELATION],
+                      dtype=np.int32)
+_FACE_CONT = np.array([(c.start, c.end)
+                       for c in _FLC.FACE_LANDMARKS_CONTOURS],
+                      dtype=np.int32)
+_FACE_IRIS = np.array([(c.start, c.end) for c in
+                       list(_FLC.FACE_LANDMARKS_LEFT_IRIS)
+                       + list(_FLC.FACE_LANDMARKS_RIGHT_IRIS)],
+                      dtype=np.int32)
+
+
+def draw_face_mesh(frame, lm, color):
+    """Vẽ mạng landmark QUANH MẶT — 478 điểm tự gắn mặt BẤT KỲ đâu."""
+    h, w = frame.shape[:2]
+    pts = np.column_stack([lm[:, 0] * w, lm[:, 1] * h]).astype(np.int32)
+    for a, b in _FACE_TESS:
+        pa, pb = pts[a], pts[b]
+        cv2.line(frame, (pa[0], pa[1]), (pb[0], pb[1]),
+                 (140, 150, 140), 1)
+    for a, b in _FACE_CONT:
+        pa, pb = pts[a], pts[b]
+        cv2.line(frame, (pa[0], pa[1]), (pb[0], pb[1]),
+                 color, 2, cv2.LINE_AA)
+    for a, b in _FACE_IRIS:
+        pa, pb = pts[a], pts[b]
+        cv2.line(frame, (pa[0], pa[1]), (pb[0], pb[1]),
+                 (40, 230, 230), 1, cv2.LINE_AA)
+    return frame
+
 
 def draw_face_hud(frame, face_r):
-    """Vẽ oval hướng dẫn đặt mặt + điểm méo mặt live + metric vượt ngưỡng.
+    """HUD méo mặt kiểu GIÁM SÁT: landmark tự gắn vào mặt BẤT KỲ ở đâu
+    trong khung (không ép vị trí — camera gác cao vẫn đo được).
     Ghi chú: cv2.putText chỉ hiển thị ASCII — dùng chữ không dấu."""
     h, w = frame.shape[:2]
-    cx, cy = w // 2, int(h * 0.46)
-    axes = (int(w * 0.22), int(h * 0.42))
     status = face_r.get('status', 'NO_FACE')
-    lost = status in ('NO_FACE', 'INVALID_LANDMARKS', 'NO_DETECTOR', 'ERROR')
+    lost = status in ('NO_FACE', 'INVALID_LANDMARKS', 'PARTIAL_FACE',
+                      'NO_DETECTOR', 'ERROR')
     color = {'DANGER': (0, 0, 255), 'WARNING': (0, 165, 255),
              'NORMAL': (60, 200, 60)}.get(status, (0, 0, 255))
-    # Oval hướng dẫn — đặt mặt vào đây (mắt ngang vạch giữa)
-    cv2.ellipse(frame, (cx, cy), axes, 0, 0, 360,
-                (0, 0, 255) if lost else (210, 210, 210), 2, cv2.LINE_AA)
 
-    # Hộp quanh mặt thật (từ 478 landmarks) + chấm landmark MediaPipe
+    # Hộp quanh mặt thật (từ 478 landmarks) + mạng landmark (NK-28)
     lm = face_r.get('raw_landmarks')
     if lm is not None:
-        for x, y in lm[::2]:
-            cv2.circle(frame, (int(x * w), int(y * h)), 1,
-                       (230, 200, 150), -1, cv2.LINE_AA)
+        frame = draw_face_mesh(frame, lm, color)
         xs, ys = lm[:, 0], lm[:, 1]
         cv2.rectangle(frame, (int(xs.min() * w), int(ys.min() * h)),
                       (int(xs.max() * w), int(ys.max() * h)), color, 2)
@@ -282,6 +323,21 @@ def draw_face_hud(frame, face_r):
                     (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                     (0, 165, 255) if tilt > 10 else (255, 255, 255), 1)
         y += 22
+    yaw, pitch = rm.get('head_yaw'), rm.get('head_pitch')
+    if yaw is not None and pitch is not None and y <= 100:
+        cv2.putText(frame,
+                    f'chuyen dau (matrix MP): quay {yaw:.0f} | nga {pitch:.0f} do',
+                    (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (200, 200, 255), 1)
+        y += 22
+    ml = rm.get('ml_prob')
+    if ml is not None and y <= 100:
+        cv2.putText(frame,
+                    f'ML v3 (28 ft): {ml:.0f}%  |  rules: '
+                    f'{rm.get("score_rules", 0):.0f}',
+                    (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (120, 255, 120), 1)
+        y += 22
     for k, (t, unit) in FACE_THRESHOLDS.items():
         if k == 'face_tilt' or y > 100:
             continue
@@ -294,8 +350,9 @@ def draw_face_hud(frame, face_r):
             y += 22
 
     if lost and not face_r.get('hold'):
-        cv2.putText(frame, 'MAT FACE — dat mat vao khung', (cx - 160, cy - 6),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+        cv2.putText(frame, 'MAT: KHONG THAY MAT — landmark tu gan khi co mat',
+                    (10, h - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.45,
+                    (0, 0, 255), 1)
     return frame
 
 

@@ -282,3 +282,58 @@
 - **Trung thực về "train kỹ hơn":** dataset fga_project (Kaggle face 3,740) KHÔNG có nhãn "cười/mép-thói-quen/gù" → KHÔNG train được các ca này bằng data hiện có; guards runtime + học 3 ngày là giải pháp đúng; muốn mạnh hơn phải thu dữ liệu có nhãn (bổ sung vào L-01A)
 - **Kiểm chứng:** laugh guard PASS · profile self-test PASS · 58/58 + 10/10 · web smoke: MJPEG 1.5MB/3s, profile trong /api/state
 - **Trạng thái:** ✅
+
+## L-32: `[WinError 10048]` — bind 127.0.0.1:5001 bị chặn khi chạy server lần 2 🔴→✅ (08/09)
+- **Người dùng tự chạy `python web_server.py` và gặp:**
+  `ERROR: [Errno 10048] error while attempting to bind on address ('127.0.0.1', 5001): only one usage of each socket address...`
+- **Nguyên nhân:** phiên test trước (do trợ lý bật nền để kiểm tra) VẪN đang nghe cổng 5001 → bản mới không bind được. Đã tắt bản cũ → cổng rảnh
+- **Fix (web_server.py):** thêm `_port_busy(5001)` kiểm tra trước khi start — nếu cổng bận: in thông báo tiếng Việt + 2 cách tắt (Ctrl+C cửa sổ cũ / `netstat -ano | findstr :5001` + `taskkill /F /PID <pid>`) rồi thoát mã 1 (không còn traceback xấu)
+- **Bài học:** script server cần tự kiểm tra cổng trước khi bind; bật nền để test xong phải tắt ngay (quy tắc với trợ lý)
+- **Trạng thái:** ✅ cổng 5001 đã rảnh — chạy lại `python web_server.py` bình thường
+- **Cải thiện thêm:** chuyển check cổng lên ĐẦU file (trước khi load model MediaPipe/YOLO) — báo lỗi NGAY trong <1 giây thay vì chờ load model ~10s rồi mới báo. Đã test giả lập cổng bận: thoát mã 1 + thông báo đúng
+
+## L-33: HUD còn tư duy "đặt mặt vào khung" — sai với camera giám sát treo cao + khung xương YOLO chưa rõ 🔴→✅ (08/09)
+- **Góp ý của người dùng:** (1) "Sao lại đặt mặt vào khung? Dùng API của MediaPipe thì các landmark tự gắn lên khuôn mặt, không phải chạy theo khung như này"; (2) "Vẫn chưa có khung xương trích xuất sâu các điểm của cơ thể trong YOLO?"; (3) "Đã là camera giám sát gia đình thì sẽ đặt lên cao thì làm sao đặt mặt vào được?"
+- **Sai sót trong code (vị trí chính xác):**
+  1. `draw_face_hud()` — CẢ HAI file `web_server.py` và `app_family.py`:
+     - Vẽ **oval hướng dẫn ở GIỮA khung** (`cv2.ellipse(frame, (cx, cy), axes, ...)`) + chữ **"MAT FACE — dat mat vao khung"** → ép người dùng đưa mặt vào giữa khung. Với camera treo cao nhìn xuống (góc người nhỏ, lệch tâm) thì không bao giờ "vào khung" được. MediaPipe FaceLandmarker tìm mặt ở TOÀN ẢNH — oval chỉ là thừa và gây hiểu nhầm
+     - **Bug tiềm ẩn nghiêm trọng hơn (chỉ `web_server.py`):** khi bỏ oval ở lần sửa trước, biến `cx, cy` bị xóa nhưng dòng chữ "MAT FACE" vẫn tham chiếu `cx - 160, cy - 6` → nếu mất mặt mà không HOLD, **thread camera sẽ crash NameError**. Đã phát hiện và sửa trong L-33 này
+  2. `draw_live_pose()` — cả hai file: `imgsz=320` + `conf=0.30` quá gắt cho người NHỎ/XA từ camera cao; đường xương 2px + chấm 3px khó thấy; không có thông tin đếm người/điểm
+- **Fix:**
+  1. BỎ hoàn toàn oval + chữ "đặt mặt vào khung" ở cả 2 file. Thay bằng 1 dòng nhỏ khi mất mặt: `MAT: KHONG THAY MAT — landmark tu gan khi co mat` (chân trái khung, không ép vị trí). Landmark MediaPipe + hộp mặt được vẽ NGAY TẠI VỊ TRÍ MẶT THẬT bất kỳ đâu trong khung
+  2. `app_family.py` thêm `'PARTIAL_FACE'` vào tập `lost` (bản web_server đã có từ L-31 — 2 file lệch nhau)
+  3. `draw_live_pose()` cả 2 file: `conf 0.30→0.25`, `imgsz 320→480` (bắt người nhỏ/xa), đường xương 2→3px, chấm 3→4px, thêm nhãn góc phải: `NGUOI: n  DIEM CO THE: m/(n×17)` — người dùng kiểm chứng được YOLO đang trích xuất đủ điểm cơ thể
+- **Kiểm chứng:** `py_compile` OK cả 2 file · 58/58 + 10/10 PASS
+- **Bài học:** thiết kế UI phải theo KỊCH BẢN LẮP ĐẶT (camera giám sát treo cao) chứ không theo kịch bản selfie; khi xóa biến phải tìm hết tham chiếu còn lại của biến đó
+- **Trạng thái:** ✅
+
+## L-34: Đòi "test 100% chính xác" → HistGB đạt AUC 1.000 và ĐÓ CHÍNH LÀ LEAKAGE 🔴→✅ (09/09)
+- **Bối cảnh:** user yêu cầu "cải thiện model tốt 100%, chỉnh thuật toán để test chính xác 100%". v3.1 mở rộng 48 cấu hình (LogReg/SVM-RBF/RandomForest/HistGB/MLP) → **HistGB_200 đạt OOF 0.999 + TEST AUC 1.000, sens 99.3%**
+- **Phát hiện (điều tra 2 bước):**
+  1. `training/leak_check_blocksize.py` — quét AUC theo cỡ block //50→//200→//500→//1000: LogReg giảm nhẹ 0.942→0.908 (ổn), NHƯNG HistGB vẫn 0.998–1.000 dù chỉ còn 8 block → leak KHÔNG nằm ở frame kề nhau mà do **tên file img_NNNN không mã hoá người/video** → cùng một người nằm cả train lẫn test, mô hình cây NHỚ hình học khuôn mặt từng người (memorization)
+  2. **Pose-only check:** chỉ 3 góc yaw/pitch/roll đã đạt AUC 0.627 → 2 thư mục Stroke/NonStroke LỆCH ĐIỀU KIỆN CHỤP (góc/quang) — batch effect. Cây học "vẹt" cả bias này
+- **Kết luận trung thực:** AUC 1.000 = đo LEAKAGE + BIAS dataset, KHÔNG phải năng lực phát hiện đột quỵ. Mô hình đáng tin: **LogReg tuyến tính 28 ft — ổn định 0.91–0.94 ở mọi cỡ block**
+- **Bài học (ghi vào hồ sơ):** đề bài thi KHÔNG cho phép "tự tạo 100%" — TRIPOD+AI/STARD coi 100% là dấu hiệu lỗi. Giá trị khoa học nằm ở việc TỰ PHÁT HIỆN và CÔNG BỐ leakage (phản biện đánh giá cao)
+- **Trạng thái:** ✅ đã biến yêu cầu "100%" thành phát hiện khoa học có bằng chứng
+
+## L-35: ML v3 "đã nối vào app" nhưng KHÔNG BAO GIỜ chấm — lệch tên key artifact ↔ runtime 🔴→✅ (17/09, NK-26)
+
+**Triệu chứng:** smoke 120 ảnh thật qua `process_frame` → 118 ảnh được chấm
+điểm nhưng `raw_metrics['ml_prob']` = None 100%. HUD/web luôn hiển thị điểm
+rules từ SYS-29 (09/09) — tức là 8 ngày_demo "ML v3" thực chất chạy rules.
+
+**Nguyên nhân:** script train lưu artifact với tên feature generic
+(`blend_asym_00..19`, `pose_yaw/pitch/roll`) trong khi runtime phát
+`asym_<tên>` + `yaw/pitch/roll`. `FaceMLV3.predict` tra dict theo tên
+artifact → thiếu → trả None → fallback rules IM LẶNG (không crash, không
+log). Test đơn vị dựng dict tay theo artifact nên PASS — không bắt được.
+
+**Sửa:** `face_module_v7.process_frame` phát thêm alias generic theo đúng
+thứ tự canonical 52 blendshape như train (đủ 20 cặp mới phát) + 3 key pose.
+Model + artifact giữ nguyên (đóng băng NK-12). Sau sửa: ML chấm 118/118,
+hướng đúng (Stroke median 77.8 vs NonStroke 6.8). Hồi quy 10/10 + 58/58 +
+8/8 PASS.
+
+**Bài học:** (1) đường nối ML phải smoke bằng dữ liệu thật qua đúng đường
+khởi tạo production; (2) tên key artifact ↔ runtime cần test đối chiếu
+2 chiều; (3) fallback im lặng phải ghi log ít nhất 1 lần đầu xảy ra.

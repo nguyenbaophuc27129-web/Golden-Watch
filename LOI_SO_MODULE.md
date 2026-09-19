@@ -476,3 +476,69 @@
 - **Kiểm chứng:** laugh guard PASS · profile self-test PASS · 58/58 · 10/10 · web smoke OK (profile hiển thị trong /api/state + banner web)
 - **Giới hạn trung thực:** dataset hiện có không có nhãn cười/gù/mép-quen — chưa train sâu được các ca này, phải thu thêm dữ liệu có nhãn (đề xuất mở rộng L-01A)
 - **Trạng thái:** ✅
+
+### SYS-26: Chuyển sang dùng MA TRẬN TƯ THẾ ĐẦU chính thức của MediaPipe Face Landmarker (góp ý người dùng) ✅
+- **Ngày:** 08/09/2026 (buổi 6) — nguồn: https://developers.google.com/edge/mediapipe/solutions/vision/face_landmarker
+- **CHUYỂN TỪ → SANG (tóm tắt 1 dòng):**
+  - **TỪ:** tự tính nghiêng đầu THỦ CÔNG bằng 2 landmark 2D (điểm trán 10 → điểm cằm 152, atan2 so trục dọc) — chỉ đo được 1 góc nghiêng, dễ nhiễu khi đầu quay ngang
+  - **SANG:** bật `output_facial_transformation_matrixes=True` trong `FaceLandmarkerOptions` — dùng MA TRẬN 4×4 chính thức mà FaceLandmarker trả về mỗi khung (ánh xạ mặt chuẩn → mặt thật), suy ra ĐỦ 3 góc Euler: **yaw (quay mặt trái/phải), pitch (ngả/cúi), roll (nghiêng vai)**
+- **Sửa file `src/detection/face_module_v7.py`:**
+  1. `FaceLandmarkerOptions` + `output_facial_transformation_matrixes=True`
+  2. Hàm mới `_head_pose_from_matrix()` — trích yaw/pitch/roll từ khối quay R của ma trận theo công thức chuẩn trong docs MediaPipe
+  3. `process_frame()` gắn `head_yaw/head_pitch/head_roll` (độ, làm tròn 1 chữ số) vào `raw_metrics` — CHỈ HIỂN THỊ, không đổi công thức điểm 3 metric cũ (score/NIHSS giữ nguyên để không phá kết quả đã nghiệm thu)
+- **Sửa HUD (`web_server.py` + `app_family.py`):** thêm dòng `chuyen dau (matrix MP): quay X | nga Y do` ngay dưới dòng nghiêng đầu — người dùng thấy rõ gương mặt DỊCH CHUYỂN theo thời gian thực
+- **Kiểm chứng (ma trận quay tổng hợp):** quay 30° quanh Y → yaw 30.0 ✓ · 35° quanh X → pitch 35.0 ✓ · 20° quanh Z → roll 20.0 ✓ (sai số <1°; DẤU theo hệ toạ độ MediaPipe, độ lớn luôn đúng) · khung hình trống → NO_FACE an toàn · 58/58 + 10/10 PASS
+- **Ý nghĩa nghiên cứu:** head pose chính thức của Google = căn cứ khoa học mạnh hơn cách tự suy; yaw/pitch lớn còn là DỮ LIỆU để sau này làm guard "đang quay đi/khuất mặt" (tránh đoán sai méo miệng khi quay ngang)
+- **Trạng thái:** ✅
+
+### SYS-27: TRAIN LẠI MÔ HÌNH MẶT theo mẫu CHÍNH THỨC Google Face Landmarker trên dataset đội ✅
+- **Ngày:** 09/09/2026 — yêu cầu: "dùng code train [mediapipe_python_tasks]_face_landmarker.py làm lại rồi train trên dataset của tôi"
+- **CHUYỂN TỪ → SANG:**
+  - **TỪ:** `training/train_face_model.py` (v2) — MLP 936 đầu vào (landmark 468×2 thô), 500K tham số, khó giải thích, output .pth
+  - **SANG:** `training/train_face_landmarker_v3.py` (v3) — dùng ĐÚNG 3 output chính thức của Face Landmarker (mẫu Colab Google): 478 landmark → 5 ratio lâm sàng (trùng chỉ số app face_module_v7) + **52 blendshapes → 20 cặp L−R bất đối xứng** + **ma trận tư thế 4×4 → yaw/pitch/roll**. Phân loại = Logistic Regression chuẩn hoá (artifact JSON 2KB, schema khớp FaceML5Feat, ngưỡng Youden J ghi sẵn)
+- **Dataset:** 3.740 ảnh (Stroke 1.241 / NonStroke 2.499, Kaggle annotated), nhãn theo THƯ MỤC (M1-05), chia theo block img//50 chống leakage (L-04), seed 42, conf 0.3 (khớp app L-28); loại 25 ảnh không thấy mặt; chọn C bằng OOF GroupKFold(5) trên train, test chạm đúng 1 lần
+- **KẾT QUẢ (test block-aware — số chặt hơn CV thường):**
+  | Nhóm đặc trưng | Số ft | AUC test | Sens | Spec | F1 |
+  |---|---|---|---|---|---|
+  | **G4_all (ratio+blend+pose)** | 28 | **0.943** | 80.1% | 94.1% | 0.846 |
+  | G1_5ratios (bản cũ) | 5 | 0.924 | 77.7% | 91.8% | 0.821 |
+  | G3_blend+pose | 23 | 0.763 | 58.5% | 80.0% | 0.598 |
+  | G2_blend đơn thuần | 20 | 0.704 | 54.7% | 79.6% | 0.599 |
+- **Phát hiện trung thực (quan trọng cho phản biện Hội đồng):**
+  1. G4_all > G1: +0.019 AUC — blendshape L−R + tư thế đầu BỔ SUNG có giá trị nhưng NHỎ; 5 ratio lâm sàng vẫn là xương sống (coef lớn nhất: mouth_ratio 2.62 — đúng cơ chế y khoa "méo miệng là dấu hiệu mạnh nhất")
+  2. Blendshape ĐƠN THUẦN yếu (AUC 0.70) — dataset này nhiều ca nhẹ/nhiếp ảnh → hệ số biểu cảm không tách được; KHÔNG được quảng cáo blendshape là "thần chú"
+  3. Chưa đạt mục tiêu Sens>90% & Spec>95% (K6): 80.1/94.1 — cần hạ ngưỡng (trade spec) hoặc thu thêm ca nặng; GHI RÕ vào hạn chế
+  4. So sánh với số cũ AUC 0.845: khác protocol (đó là OOF toàn bộ, đây là held-out block test + conf 0.3) — KHÔNG khai báo "tăng từ 0.845 lên 0.943"
+- **Artifact:** `models/face_blend_v3_20260909_201800.json` (28 ft, threshold 0.298) · `test_results/face_landmarker_v3_20260909_201800/` (results.json + roc_best.png + confusion_best.png)
+- **Giới hạn:** model v3 CHƯA qua protocol B (100 ca người khỏe — SYS-15) → KHÔNG bật trên app; feature-flag FaceML5Feat vẫn mặc định TẮT
+- **Trạng thái:** ✅
+
+### SYS-28: v3.1 MỞ RỘNG THUẬT TOÁN + PHÁT HIỆN LEAKAGE (yêu cầu "100%") ✅
+- **Ngày:** 09/09/2026 — yêu cầu: "cải thiện model tốt 100%, chỉnh thuật toán nhận diện để test chính xác 100%"
+- **CHUYỂN TỪ → SANG:**
+  - **TỪ:** v3 chỉ có 1 thuật toán (LogisticRegression, 5 giá trị C)
+  - **SANG:** `training/train_face_landmarker_v31.py` — 48 cấu hình: LogReg (± class_weight balanced) / SVM-RBF / RandomForest 400 cây / HistGradientBoosting 200 / MLP(32,16) × 3 nhóm đặc trưng; chọn bằng OOF GroupKFold(5) trên train; test chạm 1 lần; thêm **2 ngưỡng nghiệm**: Youden J + **ngưỡng sàng lọc sens≥90%** (ưu tiên y khoa); AUC kèm **CI 95% bootstrap**
+- **KẾT QUẢ 48 cấu hình (OOF train):** các mô hình PHI TUYẾN đạt ~0.99–1.00 (HistGB 0.9991 / RF 0.9976 / SVM-rbf 0.9931); LogReg 0.94
+- **ĐIỀU TRA LEAKAGE (xem L-34):** HistGB TEST AUC **1.000** → `training/leak_check_blocksize.py` quét //50→//1000: cây vẫn ~1.0 dù 8 block → memorize người (filename không mã hoá subject); pose-only AUC 0.627 → lệch điều kiện chụp. **Số 1.000 không dùng để báo cáo**
+- **MÔ HÌNH CHÍNH THỨC (không đổi): LogReg 28 ft** —
+  - Held-out block test (chặt nhất): **AUC 0.943, sens 80.1% / spec 94.1%** @Youden
+  - OOF toàn bộ (block//50): AUC 0.988; **ngưỡng sàng lọc: sens 90.0% / spec 97.7%** (thr 0.493) — đạt cột mốc Sens≥90 & Spec≥95 theo protocol OOF
+  - Ổn định theo cỡ block: 0.942/0.941/0.935/0.908 (//50→//1000)
+- **Artifact:** `models/face_blend_v3_20260909_201800.json` (chính thức) · `test_results/face_landmarker_v31_20260909_212038/` (features.npz + results.json + roc) · `test_results/leak_check_blocksize.json`
+- **Cách nói với Hội đồng:** "Chúng tôi từng đạt AUC 1.000 và TỪ CHỐI số đó vì phát hiện leakage + bias dataset; số báo cáo là 0.94 (held-out) với phân tích độ nhạy đầy đủ" — đây là điểm mạnh nghiên cứu, không phải điểm yếu
+- **Trạng thái:** ✅
+
+### SYS-29: NỐI ML v3 (28 đặc trưng) VÀO APP CHÍNH (yêu cầu "cập nhật vào app chính") ✅
+- **Ngày:** 09/09/2026 — yêu cầu: "cập nhật vào app chính công nghệ này mới điều chỉnh"
+- **CHUYỂN TỪ → SANG:**
+  - **TỪ:** camera face chấm điểm bằng RULES 5 ratio thuần (AUC rules 0.638); model v3 nằm riêng trong training, chưa chạy trong app
+  - **SANG:** face_module_v7 bật `output_face_blendshapes=True` → trích 20 asym L−R + yaw/pitch/roll → **prob ML v3 (LogReg 28 ft, AUC 0.943) THAY prob rules** làm score chính của module mặt; prob rules giữ lại trong `raw_metrics['score_rules']` để so sánh (đúng thiết kế SYS-15)
+- **Sửa 4 file:**
+  1. `src/detection/face_ml_v3.py` (MỚI) — loader artifact `face_blend_v3_*.json` (schema scaler/coef/intercept/threshold), tự-test PASS; thiếu đặc trưng → trả None → app tự fallback rules (an toàn)
+  2. `src/detection/face_module_v7.py` — blendshapes bật cùng ma trận tư thế; `_blend_asym()` cùng quy tắc đặt tên với script train; `ml_model` gán TỪ NGOÀI (app quyết định bật); guard cười vẫn áp trước ML (nhất quán); score_history median vẫn lọc prob ML
+  3. `web_server.py` — `FACE.ml_model = FaceMLV3.load_latest(MODELS)`; HUD thêm dòng xanh `ML v3 (28 ft): X% | rules: Y%`
+  4. `app_family.py` — attach trong `load_detectors()` + cùng dòng HUD
+- **Vệ sinh thiết kế:** fusion/NIHSS/defense tự động dùng prob ML qua score module mặt, KHÔNG phải sửa gì thêm; `score_rules` nằm trong raw_metrics để đối chiếu khi demo; nếu xóa artifact → app tự về rules (không crash)
+- **Kiểm chứng:** FaceMLV3 self-test PASS (mouth_ratio +3σ → prob 24.2→99.9) · khung trống NO_FACE an toàn · pipeline 28 ft đủ · **58/58 + 10/10 PASS** · py_compile OK 4 file
+- **Trung thực:** ML đã qua protocol B chưa? CHƯA — user quyết định bật (quyền của chủ dự án); khi demo NÊN nói rõ "prob ML v3, rules so sánh song song"; số AUC 0.943 là held-out block test (SYS-27), số cây 1.000 KHÔNG dùng (SYS-28)
+- **Trạng thái:** ✅

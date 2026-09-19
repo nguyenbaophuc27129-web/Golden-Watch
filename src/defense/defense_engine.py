@@ -48,7 +48,7 @@ class DefenseEngine:
     PERSISTENT_SECONDS = 30.0    # cảnh báo phải kéo dài > 30s mới nổi
     WORSEN_DELTA = 10.0          # tăng > 10 điểm trong 5p → WORSENING
 
-    def __init__(self, history_size=600):
+    def __init__(self, history_size=600, early_warning=None):
         # L1: baseline cá nhân (None = chưa calibrate → universal)
         self.baseline = None
         self.calibrated_at = None
@@ -60,9 +60,15 @@ class DefenseEngine:
         # L3: lịch sử (fused_score, timestamp) — 10 phút @ 1Hz = 600 điểm
         self.history = deque(maxlen=history_size)
 
+        # Trụ cột B (NK-11): monitor suy giảm tiến triển — tùy chọn, mặc
+        # định KHÔNG có (fallback = hệ cũ). Truyền instance
+        # EarlyWarningMonitor (src/defense/early_warning.py) để bật.
+        self.early_warning = early_warning
+
         # Thống kê cho Dashboard
         self.stats = {'suppressed_L2': 0, 'suppressed_L3': 0,
-                      'upgraded_L3': 0, 'adapted_L4': 0}
+                      'upgraded_L3': 0, 'adapted_L4': 0,
+                      'deteriorating': 0}
 
     # ------------------------------------------------------------------
     # LỚP 1 — CALIBRATION (baseline cá nhân)
@@ -170,6 +176,20 @@ class DefenseEngine:
         """
         now = time.time()
         self.history.append((fused_score, now))
+
+        # ----- BỔ SUNG (trụ cột B, NK-11): dò suy giảm tiến triển -----
+        # Nếu có monitor: LUÔN cho nó xem điểm. DETERIORATING → alert=True
+        # (cảnh báo "đang xấu dần", khuyến nghị người thân kiểm tra) kể cả
+        # khi điểm dưới ngưỡng fusion — thứ mà luật cũ KHÔNG BAO GIỜ báo.
+        # Fast-path EMERGENCY bên dưới KHÔNG bị thay đổi.
+        ew_state = None
+        if self.early_warning is not None:
+            ew_state = self.early_warning.update(fused_score, t=now)
+            if ew_state.get('state') == 'DETERIORATING':
+                self.stats['deteriorating'] += 1
+                return {'alert': True,
+                        'reason': f"DETERIORATING — {ew_state.get('reason', '')}",
+                        'trend': 'WORSENING', 'early_warning': ew_state}
 
         # Cảnh báo dưới ngưỡng fusion (50) → không cần L3
         if fused_score < 50:

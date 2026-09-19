@@ -1,0 +1,91 @@
+{
+ "protocol": "simulated trajectories (seed 42, chu kỳ 2s, warm-up 200 chu kỳ) — chờ thay bằng replay Protocol B thật",
+ "params": {
+  "ewma_alpha": 0.15,
+  "cusum_k_sigma": 0.5,
+  "cusum_h_sigma": 5.0,
+  "confirm_cycles_30s": 15,
+  "elevated_sigma": 1.5,
+  "n_runs": 20,
+  "hours_far": 6,
+  "baseline_mu0": 22.0,
+  "baseline_sigma": 6.0
+ },
+ "far_healthy_per_24h": {
+  "old_alert": 0.0,
+  "new_deteriorating": 0.0,
+  "new_watch_soft": 16.6
+ },
+ "far_burst_per_24h": {
+  "old_alert": 0.0,
+  "new_deteriorating": 0.0
+ },
+ "latency": {
+  "ramp_+40/15ph": {
+   "old": {
+    "median_min": 10.7,
+    "iqr_min": [
+     9.9,
+     11.0
+    ]
+   },
+   "new": {
+    "median_min": 5.9,
+    "iqr_min": [
+     5.5,
+     6.6
+    ]
+   },
+   "old_ever_fired": "20/20",
+   "new_ever_fired": "20/20"
+  },
+  "ramp_+40/30ph": {
+   "old": {
+    "median_min": 20.1,
+    "iqr_min": [
+     19.6,
+     21.4
+    ]
+   },
+   "new": {
+    "median_min": 10.0,
+    "iqr_min": [
+     9.1,
+     11.5
+    ]
+   },
+   "old_ever_fired": "20/20",
+   "new_ever_fired": "20/20"
+  },
+  "ramp_+40/60ph": {
+   "old": {
+    "median_min": 39.9,
+    "iqr_min": [
+     38.6,
+     40.6
+    ]
+   },
+   "new": {
+    "median_min": 20.3,
+    "iqr_min": [
+     19.9,
+     21.9
+    ]
+   },
+   "old_ever_fired": "20/20",
+   "new_ever_fired": "20/20"
+  },
+  "ramp_+18/30ph_DUOI_NGUONG": {
+   "old": null,
+   "new": {
+    "median_min": 21.6,
+    "iqr_min": [
+     19.9,
+     24.1
+    ]
+   },
+   "old_ever_fired": "0/20",
+   "new_ever_fired": "20/20"
+  }
+ }
+}

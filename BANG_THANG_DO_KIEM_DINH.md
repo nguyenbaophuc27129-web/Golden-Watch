@@ -54,8 +54,9 @@ Biểu đồ kèm: `gait_silhouette_pca.png` (PCA 2D 3 nhóm màu).
 | Công cụ | Vai trò | Trích dẫn | Trạng thái |
 |---|---|---|---|
 | **Cohen's d ± CI** (effect size) | Dataset face CÓ tín hiệu y khoa không (trước khi train) | **Cohen J. Statistical Power Analysis, 2nd ed. 1988**; SE: Hedges & Olkin 1985 | ✅ mouth_ratio d=0.759 (M1-06); forest plot `face_forest_effects.png` |
-| **Calibration curve** | Xác suất dự đoán có "tin được" không | Hosmer–Lemeshow 1980 (*Commun Stat A9:1043-1069*); Steyerberg, *Clinical Prediction Models* 2009 | ✅ `face_ml_calibration.png` |
-| **McNemar test** | So 2 mô hình trên CÙNG test set (rules vs ML) | **McNemar Q. Psychometrika. 1947;12(2):153-157** | Kế hoạch: chạy lại 2 model trên cùng block-split rồi test |
+| **Calibration curve** | Xác suất dự đoán có "tin được" không | Hosmer–Lemeshow 1980 (*Commun Stat A9:1043-1069*); Steyerberg, *Clinical Prediction Models* 2009 | ✅ `face_ml_calibration.png` (model cũ) · ✅ **v3 OOF: ECE 2.1%, Brier 0.0783 — prob đã calibrate sẵn, Platt không cần** (`stat_tests_20260916_213450/reliability_face_v3.png`) |
+| **McNemar test** | So 2 mô hình trên CÙNG test set (rules vs ML) | **McNemar Q. Psychometrika. 1947;12(2):153-157** | ✅ NK-24 (16/09): face 5-ratio vs v3 28 ft cùng OOF fold — 130 vs 137, p=0.714 (accuracy NGANG tại ngưỡng Youden; khác biệt nằm ở AUC — xem DeLong) |
+| **DeLong paired** | So AUC 2 mô hình trên CÙNG mẫu (covariance) | **DeLong ER et al. Biometrics. 1988;44(3):837-845** | ✅ NK-24: face v3 0.9419 vs 5-ratio 0.9276, Δ=0.0143, **p=1.5e-08** · speech LogReg vs MLP Δ=0.0109, p=0.213 (ngang nhau → chọn LogReg hợp lệ) |
 | **LOSO / GroupKFold theo block** | Chống leakage (đồng nhất mức subject/ảnh liên tiếp) | Varoquaux 2018 ("Cross-validation failure", *NeuroImage* 178:681-692) | ✅ gait LOSO 15 fold; face GroupKFold(5) block |
 | **Class-weight / pos_weight** | Dữ liệu lệch lớp | Chuẩn (King & Zeng 2001, *Political Analysis* 9:137-163 — rare-event correction) | ✅ mọi model |
 

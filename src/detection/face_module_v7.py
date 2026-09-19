@@ -90,6 +90,11 @@ class FaceAsymmetryDetector:
         self.landmarker = None
         self.face_mesh = None
 
+        # ML v3 (SYS-29): gán từ ngoài app — FACE.ml_model = FaceMLV3...
+        # Khi có model, prob ML THAY prob rules (SYS-15); rules giữ lại
+        # trong raw_metrics['score_rules'] để so sánh.
+        self.ml_model = None
+
         # Khoi tao MediaPipe Face Landmarker voi Tasks API
         try:
             # Try to use face_landmarker.task file from project root
@@ -120,6 +125,8 @@ class FaceAsymmetryDetector:
                     base_options=BaseOptions(model_asset_path=task_file),
                     running_mode=vision.RunningMode.VIDEO,
                     num_faces=1,
+                    output_face_blendshapes=True,
+                    output_facial_transformation_matrixes=True,
                     min_face_detection_confidence=0.3,
                     min_face_presence_confidence=0.3,
                     min_tracking_confidence=0.3
@@ -459,6 +466,47 @@ class FaceAsymmetryDetector:
         return {'score': 0, 'nihss_item_4': 0, 'status': status,
                 'raw_metrics': {}, 'raw_landmarks': None, 'hold': False}
 
+    @staticmethod
+    def _head_pose_from_matrix(matrix) -> Optional[Dict[str, float]]:
+        """
+        Goc chuyen dau (do) TU MA TRAN 4x4 CHINH THUC cua FaceLandmarker
+        (bat bang output_facial_transformation_matrixes=True):
+        - roll  = nghieng dau sang vai (so khop 'face_tilt' cu)
+        - yaw   = quay mat trai/phai
+        - pitch = ngua/cup dau
+        Cong thuc chuan tu tai lieu MediaPipe Face Landmarker:
+        developers.google.com/edge/mediapipe/solutions/vision/face_landmarker
+        LUU Y dau: theo he toa do cua ma tran (mat chuan -> mat that),
+        do lon goc LUON dung; dau am/duong chi la quy uoc chieu.
+        Da kiem chung bang ma tran quay tong hop:
+        quay quanh Y -> yaw (quay mat), quanh X -> pitch (nga/cup),
+        quanh Z -> roll (nghieng vai) — sai so < 1 do.
+        """
+        try:
+            R = np.asarray(matrix, dtype=np.float64)[:3, :3]
+            pitch = math.degrees(math.asin(max(-1.0, min(1.0, -R[2, 1]))))
+            roll = math.degrees(math.atan2(R[0, 1], R[1, 1]))
+            yaw = math.degrees(math.atan2(R[2, 0], R[2, 2]))
+            return {'head_yaw': round(yaw, 1), 'head_pitch': round(pitch, 1),
+                    'head_roll': round(roll, 1)}
+        except Exception:
+            return None
+
+    @staticmethod
+    def _blend_asym(blendshapes) -> Dict[str, float]:
+        """
+        20 cặp L−R từ 52 blendshape CHÍNH THỨC (cùng quy tắc với
+        training/train_face_landmarker_v3.py): asym_<ten> = Left − Right.
+        Đây là 20/28 đặc trưng của model ML v3.
+        """
+        names = [c.category_name for c in blendshapes]
+        scores = {c.category_name: float(c.score) for c in blendshapes}
+        out = {}
+        for n in names:
+            if n.endswith('Left') and (n[:-4] + 'Right') in scores:
+                out['asym_' + n[:-4]] = scores[n] - scores[n[:-4] + 'Right']
+        return out
+
     def _detect_expression(self, landmarks: np.ndarray) -> str:
         """
         Phân biệt BIỂU CẢM (cười lớn/nhech mép khi nói) với méo mặt đột quỵ:
@@ -517,6 +565,8 @@ class FaceAsymmetryDetector:
         try:
             # Convert BGR to RGB for MediaPipe
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            head_pose = None   # dict yaw/pitch/roll (chi co tren Tasks API)
+            bs_asym = None     # dict asym blendshape L−R (20 dac trung ML)
 
             if use_solutions:
                 # Use solutions API (FaceMesh)
@@ -548,6 +598,15 @@ class FaceAsymmetryDetector:
                 face_landmarks = result.face_landmarks[0]
                 landmarks = self._extract_landmarks(face_landmarks)
 
+                # Ma tran tu the dau 4x4 (API chinh thuc MediaPipe) ->
+                # yaw (quay) / pitch (nga-cup) / roll (nghieng) theo do
+                mats = getattr(result, 'facial_transformation_matrixes',
+                               None)
+                if mats:
+                    head_pose = self._head_pose_from_matrix(mats[0])
+                if getattr(result, 'face_blendshapes', None):
+                    bs_asym = self._blend_asym(result.face_blendshapes[0])
+
             if landmarks is None or len(landmarks) < 478:  # MediaPipe Face Mesh has 478 landmarks
                 return self._no_face('INVALID_LANDMARKS')
 
@@ -575,8 +634,37 @@ class FaceAsymmetryDetector:
                           'forehead_ratio'):
                     metrics[k] *= 0.4
 
-            # Calculate overall score
+            # Góc chuyển đầu từ ma trận chính thức MediaPipe (chỉ HIỂN THỊ,
+            # không vào điểm — 3 metric cũ giữ nguyên công thức)
+            if head_pose:
+                metrics.update(head_pose)
+                # key ngắn khớp artifact ML v3: yaw/pitch/roll
+                metrics.update({'yaw': head_pose['head_yaw'],
+                                'pitch': head_pose['head_pitch'],
+                                'roll': head_pose['head_roll'],
+                                'pose_yaw': head_pose['head_yaw'],
+                                'pose_pitch': head_pose['head_pitch'],
+                                'pose_roll': head_pose['head_roll']})
+            if bs_asym:
+                metrics.update(bs_asym)     # 20 asym — đầu vào ML v3
+                if len(bs_asym) == 20:
+                    # Alias generic khớp artifact ML v3 (blend_asym_00..19)
+                    # — cùng thứ tự canonical 52 blendshape như lúc train
+                    # (NK-26: trước đây tên key lệch → predict luôn None,
+                    # ML v3 không bao giờ chấm trong app)
+                    for _i, _v in enumerate(bs_asym.values()):
+                        metrics[f'blend_asym_{_i:02d}'] = _v
+
+            # Calculate overall score (rules — 5 ratio, khong doi cong thuc)
             score = self._calculate_overall_score(metrics)
+            metrics['score_rules'] = round(score, 1)   # giữ lại so sánh
+
+            # SYS-29: prob ML v3 THAY prob rules khi có model + đủ đặc trưng
+            if self.ml_model is not None:
+                ml_prob = self.ml_model.predict(metrics)
+                if ml_prob is not None:
+                    metrics['ml_prob'] = round(ml_prob, 1)
+                    score = ml_prob
 
             # Apply temporal filtering (median)
             self.score_history.append(score)

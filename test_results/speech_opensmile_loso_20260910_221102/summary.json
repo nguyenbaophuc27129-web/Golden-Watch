@@ -1,0 +1,24 @@
+{
+ "protocol": "S-2 openSMILE eGeMAPSv02 LOSO (so 48 ft cùng file)",
+ "seed": 42,
+ "n_files": 1100,
+ "n_features": 88,
+ "opensmile_logreg": {
+  "auc": 0.6630191798941799,
+  "threshold": 0.659,
+  "sens": 58.0,
+  "sens_ci": [
+   53.8,
+   62.1
+  ],
+  "spec": 75.4,
+  "spec_ci": [
+   71.6,
+   78.7
+  ],
+  "n": 1100,
+  "pos": 540
+ },
+ "ref_48ft_logreg_auc": 0.6201851851851852,
+ "delta_auc": 0.0428
+}

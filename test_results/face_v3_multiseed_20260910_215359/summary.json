@@ -1,0 +1,123 @@
+{
+ "protocol": "face v3 G4_all multi-seed (F-1a, NK-04)",
+ "seeds": [
+  42,
+  43,
+  44,
+  45,
+  46,
+  47,
+  48,
+  49,
+  50,
+  51
+ ],
+ "auc_mean": 0.9398,
+ "auc_sd": 0.0099,
+ "auc_min": 0.9282,
+ "auc_max": 0.9557,
+ "sens_mean": 0.8164,
+ "spec_mean": 0.9172,
+ "runs": [
+  {
+   "seed": 42,
+   "C": 0.1,
+   "auc_oof_train": 0.9419,
+   "auc_test": 0.9373,
+   "sens_test": 0.8339,
+   "spec_test": 0.8991,
+   "n_train": 2988,
+   "n_test": 727
+  },
+  {
+   "seed": 43,
+   "C": 0.03,
+   "auc_oof_train": 0.9369,
+   "auc_test": 0.9557,
+   "sens_test": 0.8053,
+   "spec_test": 0.9467,
+   "n_train": 2926,
+   "n_test": 789
+  },
+  {
+   "seed": 44,
+   "C": 0.3,
+   "auc_oof_train": 0.9419,
+   "auc_test": 0.9443,
+   "sens_test": 0.8473,
+   "spec_test": 0.8856,
+   "n_train": 3027,
+   "n_test": 688
+  },
+  {
+   "seed": 45,
+   "C": 0.1,
+   "auc_oof_train": 0.9468,
+   "auc_test": 0.9294,
+   "sens_test": 0.7716,
+   "spec_test": 0.926,
+   "n_train": 2929,
+   "n_test": 786
+  },
+  {
+   "seed": 46,
+   "C": 0.1,
+   "auc_oof_train": 0.9361,
+   "auc_test": 0.9484,
+   "sens_test": 0.8508,
+   "spec_test": 0.9442,
+   "n_train": 2990,
+   "n_test": 725
+  },
+  {
+   "seed": 47,
+   "C": 0.1,
+   "auc_oof_train": 0.9403,
+   "auc_test": 0.9481,
+   "sens_test": 0.81,
+   "spec_test": 0.9184,
+   "n_train": 2930,
+   "n_test": 785
+  },
+  {
+   "seed": 48,
+   "C": 0.1,
+   "auc_oof_train": 0.9435,
+   "auc_test": 0.9292,
+   "sens_test": 0.7853,
+   "spec_test": 0.9421,
+   "n_train": 2864,
+   "n_test": 851
+  },
+  {
+   "seed": 49,
+   "C": 0.1,
+   "auc_oof_train": 0.9461,
+   "auc_test": 0.9282,
+   "sens_test": 0.8321,
+   "spec_test": 0.8826,
+   "n_train": 2992,
+   "n_test": 723
+  },
+  {
+   "seed": 50,
+   "C": 0.1,
+   "auc_oof_train": 0.9446,
+   "auc_test": 0.9315,
+   "sens_test": 0.7984,
+   "spec_test": 0.9263,
+   "n_train": 2955,
+   "n_test": 760
+  },
+  {
+   "seed": 51,
+   "C": 0.1,
+   "auc_oof_train": 0.9401,
+   "auc_test": 0.946,
+   "sens_test": 0.8289,
+   "spec_test": 0.9011,
+   "n_train": 2961,
+   "n_test": 754
+  }
+ ]
+}

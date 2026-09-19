@@ -1,0 +1,26 @@
+{
+ "started": "2026-09-08",
+ "days": {
+  "2026-09-08": {
+   "gait_score": 50.0,
+   "motion": 0.188,
+   "mouth_ratio": 18.619,
+   "eye_ratio": 18.766,
+   "face_tilt": 4.325,
+   "nasolabial_ratio": 23.271,
+   "forehead_ratio": 7.322,
+   "_n": 50
+  },
+  "2026-09-16": {
+   "gait_score": 50.0,
+   "motion": 0.188,
+   "mouth_ratio": 75.436,
+   "eye_ratio": 26.38,
+   "face_tilt": 3.224,
+   "nasolabial_ratio": 66.586,
+   "forehead_ratio": 1.86,
+   "_n": 50
+  }
+ },
+ "applied": false
+}
