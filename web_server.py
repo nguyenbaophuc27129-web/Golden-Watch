@@ -272,40 +272,82 @@ def draw_face_mesh(frame, lm, color):
 # ======================================================================
 # VẼ OVERLAY (khung xương YOLO + HUD méo mặt MediaPipe)
 # ======================================================================
-def draw_live_pose(frame, conf=0.25):
-    """Khung xương YOLO vẽ TỪNG KHUNG (tối đa 3 người). Camera giám sát treo
-    cao → hạ conf + imgsz 480 để bắt được người NHỎ/XA ở góc trên khung."""
+def _box_iou(a, b):
+    """IoU 2 box xyxy (numpy) — dùng lọc persistence khung xương."""
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    ix = max(0, min(ax2, bx2) - max(ax1, bx1))
+    iy = max(0, min(ay2, by2) - max(ay1, by1))
+    inter = ix * iy
+    ua = (ax2 - ax1) * (ay2 - ay1) + (bx2 - bx1) * (by2 - by1) - inter
+    return inter / ua if ua > 0 else 0.0
+
+
+_POSE_LAST_BOXES = []   # box người khung trước — NK-34 chống xương "chạy lung tung"
+
+
+def draw_live_pose(frame, conf=0.10):
+    """Khung xương YOLO vẽ TỪNG KHUNG (tối đa 3 người). NK-33: conf
+    0.25→0.10 + imgsz 480→640. NK-34 thêm LỌC BỀN VỮNG: detection conf thấp
+    (<0.15) chỉ vẽ khi box đó đã có ở KHUNG TRƯỚC (IoU>0.3) — khử các
+    "người bịa" nhảy lung tung trên nhiễu/khung đen khởi động. CHỈ HIỂN
+    THỊ — đường chấm điểm dùng detector riêng của arm/gait, KHÔNG đổi."""
+    global _POSE_LAST_BOXES
     if ARM.pose_model is None:
         return frame
     try:
         with YOLO_LOCK:
             res = ARM.pose_model.predict(frame, verbose=False, conf=conf,
-                                         imgsz=480)
+                                         imgsz=640)
         kpts = res[0].keypoints
-        if kpts is None or kpts.xy is None or len(kpts.xy) == 0:
-            return frame
+        boxes = res[0].boxes
         h, w = frame.shape[:2]
         n_pts = 0
-        # NK-28: đoạn CÁNH TAY tô CYAN đậm (5-7-9 trái, 6-8-10 phải) —
-        # đúng vùng đo lệch nhẹ; phần xương còn lại xanh lá
-        ARM_BONES = {(5, 7), (7, 9), (6, 8), (8, 10)}
-        for person in kpts.xy[:3]:
-            pts = [(int(x * w), int(y * h))
-                   for x, y in person.cpu().numpy()]
-            for a, b in YOLO_SKELETON:
-                if a < len(pts) and b < len(pts):
-                    col = (230, 200, 60) if (a, b) in ARM_BONES \
-                        else (80, 220, 80)
-                    cv2.line(frame, pts[a], pts[b], col, 3, cv2.LINE_AA)
-            for i, p in enumerate(pts):
-                r = 5 if i in (5, 6, 7, 8, 9, 10) else 4
-                cv2.circle(frame, p, r, (0, 255, 255), -1, cv2.LINE_AA)
-                n_pts += 1
-        n_people = min(len(kpts.xy), 3)
+        n_people = 0
+        kept_boxes = []
+        if (kpts is not None and kpts.xy is not None
+                and boxes is not None and len(kpts.xy) > 0):
+            confs = boxes.conf.cpu().numpy()
+            # NK-28: đoạn CÁNH TAY tô CYAN đậm (5-7-9 trái, 6-8-10 phải) —
+            # đúng vùng đo lệch nhẹ; phần xương còn lại xanh lá
+            ARM_BONES = {(5, 7), (7, 9), (6, 8), (8, 10)}
+            for j, person in enumerate(kpts.xy[:3]):
+                cf = float(confs[j]) if j < len(confs) else 0.0
+                if cf < 0.15:
+                    bx = (boxes.xyxy[j].cpu().numpy()
+                          if j < len(boxes.xyxy) else None)
+                    # conf thấp: chỉ nhận khi người này đã bền ở khung trước
+                    if bx is None or not any(_box_iou(bx, pb) > 0.3
+                                             for pb in _POSE_LAST_BOXES):
+                        continue
+                    bx = tuple(float(v) for v in bx)
+                else:
+                    bx = None
+                pts = [(int(x * w), int(y * h))
+                       for x, y in person.cpu().numpy()]
+                for a, b in YOLO_SKELETON:
+                    if a < len(pts) and b < len(pts):
+                        col = (230, 200, 60) if (a, b) in ARM_BONES \
+                            else (80, 220, 80)
+                        cv2.line(frame, pts[a], pts[b], col, 3, cv2.LINE_AA)
+                for i, p in enumerate(pts):
+                    r = 5 if i in (5, 6, 7, 8, 9, 10) else 4
+                    cv2.circle(frame, p, r, (0, 255, 255), -1, cv2.LINE_AA)
+                    n_pts += 1
+                n_people += 1
+                if bx is not None:
+                    kept_boxes.append(bx)
+            kept_boxes += [tuple(float(v) for v in boxes.xyxy[j].cpu().numpy())
+                           for j in range(n_people, min(len(kpts.xy), 3))
+                           if j < len(boxes.xyxy)]
+        _POSE_LAST_BOXES = kept_boxes
+        STATE['pose_people'] = n_people
+        # NK-33: nhãn LUÔN hiện (kể cả NGUOI: 0) — phân biệt được
+        # "overlay chết" với "YOLO chạy đúng nhưng không thấy người"
         cv2.putText(frame,
                     f'NGUOI: {n_people}  DIEM CO THE: {n_pts}/{n_people * 17}',
-                    (w - 300, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                    (80, 220, 80), 1)
+                    (w - 320, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    (80, 220, 80) if n_people else (160, 160, 160), 1)
     except Exception as e:
         _rate_warn('yolo_draw', f'draw_live_pose: {e!r}', 30)
     return frame
@@ -419,6 +461,19 @@ def camera_worker():
     if not cap.isOpened():
         STATE['cam_error'] = 'Không mở được webcam'
         return
+    # NK-34: WARM-UP — C270 vừa mở cho khung ĐEN (độ sáng ~5/255,
+    # auto-exposure chưa hội tụ ~3–6s, đo bằng probe: t0=5 → t+8s=137).
+    # YOLO trên khung đen "bịa người" → xương chạy lung tung lúc mới mở.
+    # Bỏ khung tối tối đa 6s; sáng sớm thì thoát ngay.
+    warm_end = time.time() + 6.0
+    while time.time() < warm_end:
+        ok, fr = cap.read()
+        if ok and fr is not None and \
+                cv2.cvtColor(fr, cv2.COLOR_BGR2GRAY).mean() >= 20:
+            break
+        STATE['cam_error'] = 'Đang cải sáng camera (auto-exposure)...'
+        time.sleep(0.1)
+    STATE['cam_error'] = None
     frame_idx = 0
     while True:
         ok, frame = cap.read()
@@ -456,6 +511,20 @@ def camera_worker():
                 hud = live if live is not None else cached
             if hud:
                 frame = draw_face_hud(frame, hud)
+            # NK-34: overlay TRUNG THỰC khi ngồi sát — YOLO (COCO full-body)
+            # không phát hiện được khi khung chỉ có đầu+vai; mặt vẫn khóa →
+            # nói rõ hệ đang đo GÌ thay vì để khung trống như hỏng.
+            if (STATE.get('pose_people', 0) == 0 and live is not None
+                    and live.get('raw_landmarks') is not None):
+                h_cam = frame.shape[0]
+                cv2.putText(frame,
+                            'NGOI SAT: chi thay MAT - he van do MAT + GIONG',
+                            (12, h_cam - 40), cv2.FONT_HERSHEY_SIMPLEX, 0.55,
+                            (0, 200, 255), 2, cv2.LINE_AA)
+                cv2.putText(frame,
+                            'Lui ra ~1m de YOLO thay than nguoi',
+                            (12, h_cam - 16), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                            (0, 200, 255), 1, cv2.LINE_AA)
             draw_arm_panel(frame)
         except Exception as e:
             _rate_warn('cam_draw', f'overlay camera: {e!r}', 30)

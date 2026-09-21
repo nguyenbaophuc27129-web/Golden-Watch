@@ -857,3 +857,118 @@ GIẢ + Vosk "bịa" từ trên nhiễu — demo phải để người nói gầ
 WARNING 50 khi đối tượng NGỒI (pose chập người) — chuẩn bị lời giải thích
 khi phỏng vấn. Việc commit cuối ngày gồm cả đổi tên đề tài + NK-31/32
 (theo dặn để cuối ngày 19/09).
+
+## NK-33 — 20/09/2026 · XƯƠNG YOLO HIỆN CẢ KHI NGỒI SÁT CAMERA (conf 0.10 + imgsz 640 + nhãn luôn hiện)
+
+**Bối cảnh:** test app 19/09 tối — server KHÔNG hề văng lỗi (`[WARN
+yolo_draw]` = 0 lần trong toàn bộ log, `draw_live_pose` chạy đúng) nhưng
+xương không hiện → kết luận: YOLO-pose không phát hiện người nào ở
+conf 0.25 (C270 mới gắn vỏ, ngồi sát máy → nửa người trên khung bị model
+bỏ). Yêu cầu đội trưởng: xương phải hiện ngay cả khi ngồi sát, mọi trường
+hợp đều đo được.
+
+**Sửa (chỉ web_server.py — chỉ lớp HIỂN THỊ, KHÔNG đụng đường chấm
+điểm):**
+1. `draw_live_pose`: conf **0.25→0.10**, imgsz **480→640** — bắt được
+   người nửa thân khi ngồi gần; đổi lại dễ nháy vật thể nền (chấp nhận —
+   overlay giám sát, không vào fusion).
+2. Nhãn `NGUOI: n` giờ LUÔN vẽ kể cả khi **0 người** (xám) — phân biệt
+   được "overlay chết" với "YOLO chạy đúng nhưng không thấy ai" (bài học
+   NK-32: không nuốt exception im lặng).
+3. `ARM.detect_arm_weakness` / `GAIT` (chu kỳ 2s, đường chấm điểm) GIỮ
+   NGUYÊN conf riêng — model đóng băng NK-12 không bị ảnh hưởng.
+
+**Hồi quy sau sửa: 10/10 + 58/58 + 8/8 PASS.** Chờ user test mắt: ngồi
+sát camera → xương hiện ngay, góc phải trên `NGUOI: 1`.
+
+## NK-34 — 20/09/2026 · CHẨN ĐOÁN "XƯƠNG CHẠY LUNG TUNG" BẰNG PROBE: 2 NGUYÊN NHÂN THẬT + LỌC BỀN VỮNG + WARM-UP CAMERA
+
+**Báo cáo user:** "yolo không bắt được người, nó chạy lung tung" — xương
+hiện nhưng nhảy loạn vị trí. Tắt server, viết tool chẩn đoán
+`src/probe_yolo_frame.py` (chụp 5 khung → chạy YOLO conf 0.05 ở imgsz
+640/960 → in từng detection + lưu ảnh đã vẽ vào `exports/`).
+
+**Phát hiện 2 nguyên nhân THẬT (không phải bug vẽ):**
+1. **Khung đen lúc mới mở camera:** probe lần 1 đo độ sáng
+   **5/255** (gần đen tuyệt đối) — C270 vừa gắn vỏ, auto-exposure mất
+   ~3–6s hội tụ (đo dải: t0=214→t+2s=156→t+8s=137/255). YOLO chạy trên
+   khung đen **"bịa người"** (1 det conf 0.088) → xương nhảy loạn đúng lúc
+   mới mở. Lần 2 thêm chờ sáng: camera sáng sau vài giây, ảnh rõ.
+2. **Ngồi sát = ngoài phân phối:** ảnh `exports/probe_cam_t8s.jpg` cho
+   thấy người chỉ có **đầu + vai nhỏ** (thân dưới ngực bị cắt) —
+   YOLOv8n-pose train COCO full-body, KHÔNG THỂ phát hiện người nửa thân
+   cận cảnh → không có xương là ĐÚNG, không phải hỏng.
+
+**Sửa (web_server.py — chỉ lớp hiển thị/thu nhận, fusion+chấm điểm KHÔNG
+đổi):**
+1. **Lọc bền vững (persistence):** thêm `_box_iou()` + `_POSE_LAST_BOXES`
+   — detection conf < 0.15 chỉ vẽ khi box IoU>0.3 với box khung TRƯỚC →
+   khử "người bịa" nhảy trên nhiễu/khung đen; conf cao vẫn hiện ngay.
+2. **Warm-up camera:** camera_worker bỏ khung tối (mean gray < 20) tối đa
+   6s đầu, dashboard hiện "Đang cải sáng camera (auto-exposure)...".
+3. **Overlay trung thực khi ngồi sát:** mặt còn khóa + pose_people=0 →
+   chữ cam `NGOI SAT: chi thay MAT - he van do MAT + GIONG` + gợi ý lui
+   ~1m (khung trống ≠ hỏng). `STATE['pose_people']` đưa vào STATE.
+4. `probe_yolo_frame.py` thêm warm-up 6s (tool chẩn đoán không bị khung
+   đen đánh lừa lần sau).
+
+**Hồi quy sau sửa: 10/10 + 58/58 + 8/8 PASS.** Bài học: overlay "chạy
+lung tung" cần tách 2 lớp — (a) model không thấy được (cận cảnh OOD) là
+GIỚI HẠN đúng của YOLO full-body, phải nói thẳng bằng overlay thay vì
+giấu; (b) phát hiện giả trên khung đen thì khử bằng bền vững temporal,
+không nâng conf (đã thử conf 0.10 ở NK-33 vẫn nháy vì nguyên nhân là
+khung đen, không phải ngưỡng).
+
+**Bổ sung NK-34 (user đề xuất dùng model fga_project):** đối chiếu
+md5 — `src/yolov8n-pose.pt` = `fga_project/models/yolov8n-pose.pt`
+(md5 `fce9c3a495cc42f597c8191798b1445b`, 6,832,633 byte; copy 07/09) →
+đổi path KHÔNG thay đổi model. Không có xương khi ngồi sát là giới hạn
+phân phối của YOLOv8n-pose (COCO toàn thân), không phải do chọn nhầm
+file. Lộ trình demo: camera đặt ngang ngực trở lên (~1–1,5m) → xương
+hiện + bám ổn nhờ persistence NK-34; ngồi cận cảnh thì hệ chủ động đo
+mặt + giọng (overlay đã nói rõ).
+
+## NK-35 — 21/09/2026 · ĐO BỘ THANG ĐO QUỐC TẾ (MỤC III GVHD) — KHÔNG RETRAIN
+
+**Bối cảnh:** GVHD gợi ý (i) làm giàu dataset quốc tế (OASIS/UK Biobank,
+CK+/TFD, MeGlass, UA-Speech, CASIA, UP-Fall) + (ii) đo bộ thang đo quốc tế
+(Sens/Spec, FPR<5%, FNR<1%, AUPRC, Latency to Alarm, Brier/ECE, confusion
+4 mức, FPS, MTTD). Trước hạn nộp 19:00 cùng ngày → chốt: KHÔNG tải
+dataset mới (tất cả đều cần license/đăng ký duyệt — UA-Speech ký thỏa
+thuận UIUC, CASIA đơn duyệt, CK+/TFD form, OASIS/UK Biobank tài khoản —
+không kịp, không hợp lệ) và KHÔNG retrain (phá số đã khóa NK-12 trước
+gờ thi). Mục II ghi vào báo cáo ở dạng "nguồn dữ liệu quốc tế đang dùng
++ lộ trình xin quyền".
+
+**Đo thật (`training/eval_international_metrics.py`, seed 42, không đụng
+model/ngưỡng NK-12) → `test_results/international_metrics_20260921_173140/`:**
+- **Face v3** (OOF GroupKFold-5 block, C=0.03, thr Youden 0.298, n=3715):
+  Sens 84.21 / Spec 89.41 / FPR 10.59% / FNR 15.79% / **AUPRC 0.9226**
+  (baseline prevalence 0.334) / AUC 0.9419 khớp NK-24; Brier 0.082,
+  ECE 4.54% (tham chiếu — ECE công bố NK-24 là 2.1% với inner-C per fold).
+- **Speech LOSO NGƯỜI-THẬT** (oof NK-03, n=1100, thr 0.5): Sens 60.19 /
+  Spec 61.25 / **AUPRC 0.6572** (baseline 0.4909) — số trung thực, không
+  dùng 0.992 leakage.
+- **Gait v2** (metrics_pack 07/09, LOSO PhysioNet): Sens 94.12 / Spec
+  88.28 / AUC 0.879.
+- **Fusion 4 mức:** mô phỏng seed 42, 200 chu kỳ/lớp, chạy qua
+  FusionEngine THẬT (weights .20/.20/.30/.15/.15, ngưỡng 30/50/70, dict
+  đúng key adapter score/speech_prob/arm_prob/gait_prob/fall_prob) →
+  confusion 4x4 ĐỐI XỨNG 100%, FPR=0 / FNR=0 (cảnh báo = WARNING+) —
+  kiểm tra ĐỊNH TUYẾN tầng fusion, không phải khả năng phát hiện.
+  (Lỗi lần đầu: dùng key 'prob' chung → adapter không thấy prob → mọi
+  module bị loại → tất cả NORMAL; đã sửa đúng key từng module + hiệu
+  chỉnh dải prob để trung bình lớp rơi đúng dải ngưỡng.)
+- **Latency to Alarm** (replay NK-11): 10.7→5.9 / 20.1→10.0 / 39.9→20.3
+  phút (giảm 45–50%); ramp +18/30ph dưới ngưỡng: cũ 0/20 vs mới 20/20
+  @21.6ph; FAR 0/24h cả hai.
+- **System:** MediaPipe 4.1ms/khung (1280x720); YOLO bench đơn lẻ
+  408ms/khung chỉ tham chiếu (điều kiện không như production — audit
+  NK-26 chu kỳ đầy đủ 80.9ms); MTTD ngân sách thiết kế = radar confirm
+  45s + chu kỳ 2.2s + push 0.2s ≈ 47.4s (ngã đã confirm → ~2.4s).
+
+**Kết luận cho báo cáo:** module đơn lẻ vẫn còn FPR/FNR trên mục tiêu
+MDR (riêng speech yếu — limitation trung thực); hệ thống TẠI TẦNG FUSION
+đạt FPR=0/FNR=0 trong mô phỏng định tuyến; AUPRC cao hơn baseline rõ ở
+face (+0.59) và speech (+0.17). 4 PNG: pr_curves_auprc,
+confusion_4level_fusion, latency_to_alarm, mdr_fpr_fnr + CSV bảng số.

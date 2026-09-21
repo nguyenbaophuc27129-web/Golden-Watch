@@ -1,0 +1,5 @@
+﻿module,sensitivity,specificity,FPR,FNR,AUPRC/AUC,Brier,ECE_10bin,protocol
+face_v3,0.8421,0.8941,0.1059,0.1579,0.9226,0.082,0.0454,"OOF GroupKFold(5) theo block, C=0.03, seed 42 — đúng protocol NK-24; thr = Youden artifact 0.298; ECE công bố NK-24 (2.1%) dùng C chọn inner-OOF mỗi fold — số đo nhanh ở đây tham chiếu"
+speech_loso,0.6019,0.6125,0.3875,0.3981,0.6572,0.2933,0.2325,"LOSO theo NGƯỜI THẬT 15 subject (khử leakage session NK-03) — số trung thực, KHÔNG dùng 0.992"
+gait_v2,0.9412,0.8828,0.1172,0.0588,0.879,,,LOSO PhysioNet 15 subject — metrics_pack 07/09
+fusion_sim,1.0,1.0,0.0,0.0,,,,"MÔ PHỎNG seed 42 chạy qua FusionEngine THẬT (weights face .20 speech .20 arm .30 gait .15 radar .15; ngưỡng 30/50/70) — kiểm tra định tuyến tầng fusion, KHÔNG phải khả năng phát hiện"

@@ -174,7 +174,7 @@
       "section": "E.Results",
       "name": "E2 Alert JSONL tồn tại + có event",
       "ok": true,
-      "detail": "alerts_20260919.jsonl: 91 events"
+      "detail": "alerts_20260920.jsonl: 31 events"
     },
     {
       "section": "F.Defense",
@@ -312,7 +312,7 @@
       "section": "J.Handoff",
       "name": "J3 QR tóm tắt tạo được + file tồn tại",
       "ok": true,
-      "detail": "QR 969B"
+      "detail": "QR 985B"
     },
     {
       "section": "K.Validation",

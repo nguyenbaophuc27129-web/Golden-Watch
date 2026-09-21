@@ -30,6 +30,16 @@
    "nasolabial_ratio": 33.398,
    "forehead_ratio": 1.479,
    "_n": 1375
+  },
+  "2026-09-20": {
+   "gait_score": 50.0,
+   "motion": 0.126,
+   "mouth_ratio": 32.596,
+   "eye_ratio": 34.107,
+   "face_tilt": 3.328,
+   "nasolabial_ratio": 42.163,
+   "forehead_ratio": 1.339,
+   "_n": 368
   }
  },
  "applied": true

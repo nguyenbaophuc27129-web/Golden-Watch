@@ -1,0 +1,153 @@
+{
+ "purpose": "NK-35 — Thang đo quốc tế Mục III (Sens/Spec/FPR/FNR, AUPRC, Brier/ECE, Latency, Confusion 4 mức, FPS/MTTD)",
+ "protocol_freeze": "NK-12: model + ngưỡng KHÔNG đổi, chỉ đo",
+ "face_v3": {
+  "n": 3715,
+  "TP": 1045,
+  "FP": 262,
+  "FN": 196,
+  "TN": 2212,
+  "sensitivity": 0.8421,
+  "specificity": 0.8941,
+  "FPR": 0.1059,
+  "FNR": 0.1579,
+  "precision": 0.7995,
+  "f1": 0.8203,
+  "auc_oof": 0.9419,
+  "auprc": 0.9226,
+  "auprc_baseline_prevalence": 0.3341,
+  "brier": 0.082,
+  "ece_10bin": 0.0454,
+  "ece_published_nk24_inner_c": 0.021,
+  "brier_published_nk24": 0.0783,
+  "threshold": 0.298,
+  "protocol": "OOF GroupKFold(5) theo block, C=0.03, seed 42 — đúng protocol NK-24; thr = Youden artifact 0.298; ECE công bố NK-24 (2.1%) dùng C chọn inner-OOF mỗi fold — số đo nhanh ở đây tham chiếu"
+ },
+ "speech_loso": {
+  "n": 1100,
+  "TP": 325,
+  "FP": 217,
+  "FN": 215,
+  "TN": 343,
+  "sensitivity": 0.6019,
+  "specificity": 0.6125,
+  "FPR": 0.3875,
+  "FNR": 0.3981,
+  "precision": 0.5996,
+  "f1": 0.6007,
+  "auc_loso": 0.6202,
+  "auprc": 0.6572,
+  "auprc_baseline_prevalence": 0.4909,
+  "brier": 0.2933,
+  "ece_10bin": 0.2325,
+  "threshold": 0.5,
+  "protocol": "LOSO theo NGƯỜI THẬT 15 subject (khử leakage session NK-03) — số trung thực, KHÔNG dùng 0.992"
+ },
+ "gait_v2": {
+  "sensitivity": 0.9412,
+  "specificity": 0.8828,
+  "FPR": 0.1172,
+  "FNR": 0.0588,
+  "auc_loso": 0.879,
+  "f1": 0.64,
+  "protocol": "LOSO PhysioNet 15 subject — metrics_pack 07/09"
+ },
+ "fusion_sim": {
+  "n": 800,
+  "TP": 400,
+  "FP": 0,
+  "FN": 0,
+  "TN": 400,
+  "sensitivity": 1.0,
+  "specificity": 1.0,
+  "FPR": 0.0,
+  "FNR": 0.0,
+  "precision": 1.0,
+  "f1": 1.0,
+  "confusion_4level": [
+   [
+    200,
+    0,
+    0,
+    0
+   ],
+   [
+    71,
+    129,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    0,
+    200
+   ],
+   [
+    0,
+    0,
+    0,
+    200
+   ]
+  ],
+  "labels": [
+   "NORMAL",
+   "MONITOR",
+   "WARNING",
+   "EMERGENCY"
+  ],
+  "n_per_class": 200,
+  "seed": 42,
+  "protocol": "MÔ PHỎNG seed 42 chạy qua FusionEngine THẬT (weights face .20 speech .20 arm .30 gait .15 radar .15; ngưỡng 30/50/70) — kiểm tra định tuyến tầng fusion, KHÔNG phải khả năng phát hiện"
+ },
+ "latency_to_alarm": {
+  "protocol": "simulated trajectories (seed 42, chu kỳ 2s, warm-up 200 chu kỳ) — chờ thay bằng replay Protocol B thật — FAR 0/24h cả 2 hệ",
+  "ramps": {
+   "ramp_+40/15ph": {
+    "old_min": 10.7,
+    "new_min": 5.9,
+    "old_fired": "20/20",
+    "new_fired": "20/20"
+   },
+   "ramp_+40/30ph": {
+    "old_min": 20.1,
+    "new_min": 10.0,
+    "old_fired": "20/20",
+    "new_fired": "20/20"
+   },
+   "ramp_+40/60ph": {
+    "old_min": 39.9,
+    "new_min": 20.3,
+    "old_fired": "20/20",
+    "new_fired": "20/20"
+   },
+   "ramp_+18/30ph_DUOI_NGUONG": {
+    "old_min": null,
+    "new_min": 21.6,
+    "old_fired": "0/20",
+    "new_fired": "20/20"
+   }
+  },
+  "headline": "ramp +18/30ph DƯỚI ngưỡng: hệ cũ 0/20 KHÔNG BAO GIỜ vs mới 20/20 @21.6ph; giảm 45–50% độ trễ ở 3 ramp trên ngưỡng"
+ },
+ "system": {
+  "protocol": "Đo trực tiếp trên máy RTX 3050 (khung 1280x720), 30 khung; MTTD = ngân sách thiết kế từ spec radar",
+  "yolo_pose_ms_per_frame": 408.4,
+  "face_landmarker_ms_per_frame": 4.1,
+  "camera_fps": 30,
+  "yolo_device": "cuda:0",
+  "note": "chu kỳ phân tích đầy đủ đã audit NK-26: 80.9ms — 4 luồng song song không nghẽn; bench đơn lẻ ở đây chỉ tham chiếu",
+  "mttd_budget_s": {
+   "radar_fall_confirm_window_s": 45,
+   "analysis_cycle_s": 2.2,
+   "alert_push_s": 0.2,
+   "total_worst_case_s": 47.4,
+   "note": "ngã đã confirm → cảnh báo ở chu kỳ kế tiếp (~2.4s) — smoke NK-32"
+  }
+ },
+ "mdr_targets": {
+  "FPR_max": 0.05,
+  "FNR_max": 0.01,
+  "note": "MDR Class IIa/IIb — mục tiêu GVHD đề"
+ }
+}

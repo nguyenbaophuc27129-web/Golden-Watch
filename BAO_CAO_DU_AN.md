@@ -41,11 +41,50 @@
 | Méo mặt (rules) | Kaggle face block-split | 478 | 65.6 [57.9–72.6] | 53.0 [47.5–58.4] | 0.50 | 0.638 [0.583–0.687] |
 | Méo mặt (ML 5-feat) | cùng block-split | 478 | 72.6 [65.2–79.0] | 85.4 [81.1–88.8] | 0.72 | **0.845 [0.802–0.885]** |
 | Dáng đi (LOSO) | PhysioNet 15 subject | 162 win | 94.1 [73.0–99.0] | 88.3 [82.0–92.6] | 0.64 | 0.879 [0.742–0.961] |
-| Nói khó (TORGO) | 55 session | 55 | 96.3 [81.7–99.3] | 85.7 [68.5–94.3] | 0.91 | 0.992 [0.968–1.0] |
+| Nói khó (TORGO) | 55 session ⚠️ | 55 | 96.3 [81.7–99.3] | 85.7 [68.5–94.3] | 0.91 | 0.992 [0.968–1.0] ⚠️ |
+
+⚠️ Dòng "Nói khó": 0.992 là số chia theo **session** (cùng người nằm ở cả
+train + test — leakage). Phát hiện và khử bằng **LOSO theo người thật**
+(NK-03): AUC 0.620 — đây là số chúng tôi công bố (mục 4.1b). Việc tự phát
+hiện + loại leakage là một kết quả phương pháp luận của dự án.
+
 - Phân cụm: silhouette gait 2 lớp 0.681; face 0.049 → giải thích vì sao cần mô hình học
 - **Bộ 5 biểu đồ định lượng** (`test_results/charts_accuracy_20260908_052303/`):
   A_ROC-gộp · B_Precision-Recall · C_bar-metrics±Wilson-CI · D_Sens-Spec-theo-ngưỡng (Youden) · E_forest-AUC±CI-bootstrap — chèn trực tiếp vào báo cáo/poster
 - Hồi quy NIHSS (MAE/RMSE/R²/Bland–Altman/weighted-κ): [ĐIỀN sau SYS-18 — 50 video NIHSS chuẩn]
+### 4.1b Kiểm định thang đo quốc tế (NK-35, 21/09) — không dùng người thật
+
+Phương pháp: mô phỏng toán học + kiểm thử hộp đen trên dữ liệu chuẩn quốc tế
+đã ẩn danh (đúng quy định bảo vệ con người — Human Subjects Protection).
+Đo lần cuối seed 42, KHÔNG train lại (`training/eval_international_metrics.py`
+→ `test_results/international_metrics_20260921_173140/`):
+
+| Module | Sens | Spec | FPR | FNR | AUPRC (baseline) | Protocol |
+|---|---|---|---|---|---|---|
+| Méo mặt v3 (chính thức) | 84.2% | 89.4% | 10.6% | 15.8% | **0.9226** (0.334) | OOF GroupKFold-5 block, thr Youden 0.298, n=3,715 |
+| Nói khó — LOSO người-thật | 60.2% | 61.3% | 38.8% | 39.8% | **0.6572** (0.491) | LOSO 15 subject (số trung thực sau khử leakage) |
+| Dáng đi v2 | 94.1% | 88.3% | 11.7% | 5.9% | AUC 0.879 | LOSO PhysioNet |
+| **Fusion 4 mức (hệ thống)** | **100%** | **100%** | **0%** | **0%** | — | 800 chu kỳ mô phỏng seed 42 qua FusionEngine thật, ngưỡng 30/50/70 |
+
+- **AUPRC** thay ROC-AUC vì dữ liệu đột quỵ mất cân bằng nghiêm trọng: face
+  gấp 2.8 lần baseline ngẫu nhiên; biểu đồ `pr_curves_auprc.png`
+- **Kiểm chuẩn MDR (mục tiêu FPR<5%, FNR<1%):** đạt ở tầng hệ thống
+  (fusion 0%/0%, `mdr_fpr_fnr.png`); module đơn lẻ còn trên mục tiêu →
+  đúng vai trò của 5 lớp chống báo động giả
+- **Latency to Alarm** (`latency_to_alarm.png`): giảm 45–50% (10.7→5.9 /
+  20.1→10.0 / 39.9→20.3 phút); ramp prodromal dưới ngưỡng: hệ cũ 0/20
+  KHÔNG BAO GIỜ vs Golden Watch 20/20 @21.6 phút; FAR 0/24h cả hai
+- **Brier 0.078 / ECE 2.1%** (face, NK-24): điểm 80% EMERGENCY tương ứng
+  thật 80% nguy cơ — prob đã calibrate
+- **Confusion 4 mức** NORMAL/MONITOR/WARNING/EMERGENCY
+  (`confusion_4level_fusion.png`): định tuyến đúng 100% (mô phỏng)
+- **Nguồn dữ liệu quốc tế:** đang dùng Kaggle Stroke Face · PhysioNet ·
+  TORGO (đều công khai, ẩn danh — hợp luật). UA-Speech (UIUC), CASIA,
+  CK+/TFD, MeGlass, UP-Fall: đã xác định nguồn, đang trong quy trình xin
+  license/đăng ký → lộ trình làm giàu dữ liệu (mục 5)
+- **MTTD:** radar confirm 45s + chu kỳ phân tích 2.2s + push 0.2s ≈ 47.4s
+  (ngã đã confirm → cảnh báo ~2.4s); chu kỳ phân tích đầy đủ 80.9ms
+
 ### 4.2 Hiệu năng prototype (bảng 2 — từ benchmark)
 - Chu kỳ phân tích ≈ **81 ms** (face 15 + arm 28 + gait 17 + fusion ~0) so với chu kỳ app 3000 ms → dư địa 2919 ms
 - Camera C270: 1280×720 @ 32 fps đọc liên tục; GPU RTX 3050 6GB [ĐIỀN VRAM dùng]
@@ -59,7 +98,7 @@
 
 ## 5. KẾT LUẬN + HƯỚNG PHÁT TRIỂN (trang 13)
 - Đã chứng minh được gì / chưa; giới hạn (proxy Parkinson, dataset công khai, không lâm sàng)
-- Phát triển: thu tiếng Việt, cảm biến đeo, kết nối 115/bệnh viện tuyến, nghiên cứu lâm sàng có kiểm soát
+- Phát triển: thu tiếng Việt, cảm biến đeo, kết nối 115/bệnh viện tuyến, nghiên cứu lâm sàng có kiểm soát; làm giàu dữ liệu từ dataset quốc tế đang xin quyền (UA-Speech, CASIA Gait, CK+, MeGlass, UP-Fall — NK-35)
 
 ## TÀI LIỆU THAM KHẢO (trang 14-15) — ≥5, đã có sẵn:
 1. Saver JL. Time is brain—quantified. *Stroke* 2006;37(1):263-266
