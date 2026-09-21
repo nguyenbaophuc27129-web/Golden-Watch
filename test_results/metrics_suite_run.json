@@ -174,7 +174,7 @@
       "section": "E.Results",
       "name": "E2 Alert JSONL tồn tại + có event",
       "ok": true,
-      "detail": "alerts_20260920.jsonl: 31 events"
+      "detail": "alerts_20260921.jsonl: 21 events"
     },
     {
       "section": "F.Defense",
@@ -246,7 +246,7 @@
       "section": "G.Radar",
       "name": "G6 Normal không DANGER + format FusionEngine",
       "ok": true,
-      "detail": "prob=0.0 status=NORMAL, đủ 4 key"
+      "detail": "prob=12.0 status=NORMAL, đủ 4 key"
     },
     {
       "section": "H.NIHSS",
@@ -312,7 +312,7 @@
       "section": "J.Handoff",
       "name": "J3 QR tóm tắt tạo được + file tồn tại",
       "ok": true,
-      "detail": "QR 985B"
+      "detail": "QR 975B"
     },
     {
       "section": "K.Validation",

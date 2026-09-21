@@ -323,14 +323,29 @@ def draw_live_pose(frame, conf=0.10):
                     bx = tuple(float(v) for v in bx)
                 else:
                     bx = None
-                pts = [(int(x * w), int(y * h))
-                       for x, y in person.cpu().numpy()]
+                # NK-36: LỌC THEO ĐỘ TIN CẬY TỪNG ĐIỂM (conf keypoint >= 0.3)
+                # — trước đây vẽ CẢ 17 điểm kể cả điểm nhiễu (conf 0.05) có
+                # tọa độ rải ngẫu nhiên → xương vẽ loạn ("chạy lung tung")
+                # đúng khi đã phát hiện được người. YOLO luôn trả đủ 17 cặp
+                # tọa độ nhưng điểm yếu phải BỎ, không vẽ.
+                kpc = (kpts.conf[j].cpu().numpy()
+                       if (kpts.conf is not None and j < len(kpts.conf))
+                       else None)
+                raw = person.cpu().numpy()
+                pts, ok_pts = [], []
+                for i, (x, y) in enumerate(raw):
+                    good = kpc is None or kpc[i] >= 0.3
+                    pts.append((int(x * w), int(y * h)))
+                    if good:
+                        ok_pts.append(i)
+                ok = set(ok_pts)
                 for a, b in YOLO_SKELETON:
-                    if a < len(pts) and b < len(pts):
+                    if a in ok and b in ok:
                         col = (230, 200, 60) if (a, b) in ARM_BONES \
                             else (80, 220, 80)
                         cv2.line(frame, pts[a], pts[b], col, 3, cv2.LINE_AA)
-                for i, p in enumerate(pts):
+                for i in ok_pts:
+                    p = pts[i]
                     r = 5 if i in (5, 6, 7, 8, 9, 10) else 4
                     cv2.circle(frame, p, r, (0, 255, 255), -1, cv2.LINE_AA)
                     n_pts += 1

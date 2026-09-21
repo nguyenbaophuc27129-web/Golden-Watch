@@ -972,3 +972,37 @@ MDR (riêng speech yếu — limitation trung thực); hệ thống TẠI TẦNG
 đạt FPR=0/FNR=0 trong mô phỏng định tuyến; AUPRC cao hơn baseline rõ ở
 face (+0.59) và speech (+0.17). 4 PNG: pr_curves_auprc,
 confusion_4level_fusion, latency_to_alarm, mdr_fpr_fnr + CSV bảng số.
+
+## NK-36 — 21/09/2026 · LỌC KEYPOINT THEO ĐỘ TIN CẬY + PROBE CHỨNG MINH "NGỒI XA" THỰC CHẤT LÀ CẬN CẢNH
+
+**Bối cảnh:** user báo "vẫn không có xương YOLO" rồi "tôi ngồi xa rồi mà
+vẫn không được?". Chạy `src/probe_yolo_frame.py` (NK-33/34) chụp khung
+thật + chạy YOLOv8n-pose conf 0.05 ở 2 imgsz:
+
+- Camera sáng sau 0.5s (warm-up NK-34 hoạt động).
+- imgsz 640: **CÓ detection** box conf 0.823→(lần 2) 0.638, khung bao
+  phần ĐẦU-VAI; keypoint conf>0.3 chỉ **6/17** — toàn điểm ĐẦU
+  (mũi mắt tai); imgsz 960 tương tự (0.595).
+- Phân tích ảnh `exports/probe_yolo_i640.jpg`: khung hình chỉ thấy
+  đầu + vai ở khoảng **cận cảnh (khoảng một cánh tay)** với camera —
+  người ngồi CHƯA lùi xa như nghĩ; xương không vẽ là ĐÚNG toán học
+  (không có điểm hông/chân để nối).
+
+**BUG NK-36 phát hiện khi soi `draw_live_pose`:** code cũ vẽ **CẢ 17
+điểm** kể cả 11 điểm conf<0.3 — điểm nhiễu có tọa độ gần NGẪU NHIÊN →
+xương "chạy lung tung" ngay cả khi detection hợp lệ. Fix web_server.py
++ probe (giống probe NK-33 `annotate`): chỉ vẽ điểm/bên có **conf
+keypoint ≥ 0.3** (bên nối vẽ khi CẢ 2 đầu hợp lệ); thêm kiểm tra trả
+về `cv2.imwrite` (in "LOI GHI ANH" khi thất bại — imwrite có thể câm
+lặng thất bại). Model/conf/imgsz KHÔNG đổi (NK-12).
+
+**Cách sử dụng đúng:** mở `exports/probe_yolo_i640.jpg` xem camera
+thấy gì → lùi/đặt lại camera đến khi thấy TỚI EO (label dashboard
+"NGUOI: 1 DIEM CO THE >= 10") → xương hiện đầy đủ; ngược lại cảnh
+cận → overlay "NGOI SAT: chi thay MAT" đúng như thiết kế NK-34.
+
+**Kiểm chứng:** server khởi động lại + dashboard 200 + /api/state
+đủ 5 module (speech DANGER 100 từ mic xa — AGC nhiễu, lưu ý demo
+phải nói gần mic). Hồi quy cột mốc sau: giữ kết quả NK-32/34/35
+(10/10 + 58/58 + 8/8) — fix chỉ nằm ở lớp VẼ HUD, không đụng pipeline
+phân tích.

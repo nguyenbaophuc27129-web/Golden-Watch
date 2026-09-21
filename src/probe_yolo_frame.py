@@ -37,14 +37,20 @@ def annotate(frame, res, imgsz):
     boxes = res[0].boxes
     n_det = 0 if boxes is None else len(boxes)
     if kpts is not None and kpts.xy is not None:
-        for person in kpts.xy:
-            pts = [(int(x * w), int(y * h))
-                   for x, y in person.cpu().numpy()]
+        for j, person in enumerate(kpts.xy):
+            # NK-36: chỉ vẽ điểm/bên có conf keypoint >= 0.3 (bỏ điểm nhiễu)
+            kpc = (kpts.conf[j].cpu().numpy()
+                   if (kpts.conf is not None and j < len(kpts.conf))
+                   else None)
+            raw = person.cpu().numpy()
+            pts = [(int(x * w), int(y * h)) for x, y in raw]
+            ok = {i for i in range(len(raw))
+                  if kpc is None or kpc[i] >= 0.3}
             for a, b in SKELETON:
-                if a < len(pts) and b < len(pts):
+                if a in ok and b in ok:
                     cv2.line(frame, pts[a], pts[b], (80, 220, 80), 3)
-            for p in pts:
-                cv2.circle(frame, p, 4, (0, 255, 255), -1)
+            for i in sorted(ok):
+                cv2.circle(frame, pts[i], 4, (0, 255, 255), -1)
     if boxes is not None:
         for b in boxes:
             x1, y1, x2, y2 = b.xyxy[0].cpu().numpy().astype(int)
@@ -109,8 +115,10 @@ def main():
                 print(f'    #{j} cls={cls} conf={conf:.3f} '
                       f'box=({x1},{y1})-({x2},{y2}) kp_conf>0.3: {n_kp}/17')
         out = os.path.join(OUT_DIR, f'probe_yolo_i{imgsz}.jpg')
-        cv2.imwrite(out, annotate(frame.copy(), res, imgsz))
-        print(f'    anh: {out}')
+        if not cv2.imwrite(out, annotate(frame.copy(), res, imgsz)[0]):
+            print(f'    LOI GHI ANH: {out}')
+        else:
+            print(f'    anh: {out}')
     print('XONG — so sánh 2 ảnh exports/probe_yolo_i640.jpg / i960.jpg')
 
 
